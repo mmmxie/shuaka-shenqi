@@ -1,0 +1,1930 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="刷卡神器">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="apple-touch-icon" id="app-icon">
+<title>刷卡神器</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#F5F5F5;--w:#FFFFFF;--surface:#FFFFFF;--surface-2:#F0F0F0;
+  --text:#0D0D0D;--sub:#8A8A8A;--muted:#BBBBBB;
+  --accent:#D4380D;--accent-bg:#FFF0EB;
+  --border:#E8E8E8;--border-strong:#0D0D0D;
+  --green:#16A34A;--yellow:#CA8A04;--red:#DC2626;--blue:#2563EB;
+  --sh:0 1px 4px rgba(0,0,0,.06);--r:10px;--r-sm:6px;--r-lg:16px;--r-pill:100px}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+  background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh}
+/* Header */
+.hdr{background:#FFFFFF;color:var(--text);padding:13px 16px;padding-top:calc(13px + env(safe-area-inset-top));
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;
+  border-bottom:1px solid var(--border)}
+.hdr-logo{font-size:17px;font-weight:800}.hdr-logo em{color:var(--accent);font-style:normal}
+/* Nav */
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;
+  background:#fff;border-top:1px solid var(--border);display:flex;z-index:50;
+  padding-bottom:env(safe-area-inset-bottom)}
+.nb{flex:1;border:none;background:none;padding:10px 0;cursor:pointer;display:flex;
+  flex-direction:column;align-items:center;gap:2px;color:var(--sub);font-size:10px;font-weight:600}
+.nb{padding:8px 12px;border-radius:12px}.nb.on{color:var(--accent);background:var(--accent-bg)}.nb-i{font-size:22px}
+/* Screens */
+.scr{display:none;padding-bottom:80px;animation:fu .18s ease}
+.scr.on{display:block}
+@keyframes fu{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+/* Lbl */
+.lbl{padding:10px 16px 4px;font-size:11px;font-weight:700;color:var(--sub);
+  text-transform:uppercase;letter-spacing:.8px}
+/* Region grid */
+.rg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:4px 16px;margin-bottom:4px}
+.rb{background:#fff;border:2px solid transparent;border-radius:var(--r);padding:12px 4px;
+  cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;
+  box-shadow:var(--sh);transition:all .12s}
+.rb:active{transform:scale(.93)}.rb.sel{border-color:var(--accent);background:var(--accent-bg)}
+.rf{font-size:26px;line-height:1}.rl{font-size:10px;font-weight:700;color:var(--sub)}
+/* Scenario */
+.sw{padding:8px 16px 0}
+.ss{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:var(--r);
+  font-size:16px;background:#fff;outline:none;appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center}
+.ss:focus{border-color:var(--accent)}
+/* Amount */
+.ar{margin:8px 16px;background:#fff;border-radius:var(--r);padding:12px 14px;
+  display:flex;align-items:center;gap:8px;box-shadow:var(--sh);flex-wrap:nowrap}
+.ac{font-size:13px;color:var(--sub);font-weight:600}
+.ai{flex:1;border:none;outline:none;font-size:22px;font-weight:800;color:var(--text);
+  text-align:right;background:transparent}
+.amt-hint{font-size:11px;color:var(--sub);white-space:nowrap}
+.qbs{display:flex;gap:6px;padding:0 16px 8px;flex-wrap:wrap}
+.qb{background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px 14px;
+  font-size:13px;cursor:pointer;font-weight:600;color:var(--sub);transition:all .15s}
+.qb:active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.qb.sel{background:var(--accent);color:#fff;border-color:var(--accent)}
+/* Winner */
+.wc{margin:0 16px;border-radius:var(--r-lg);padding:24px;color:#fff;position:relative;overflow:hidden}
+.wchip{display:inline-block;background:rgba(255,255,255,.15);padding:3px 10px;border-radius:var(--r-pill);
+  font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:10px}
+.wn{font-size:20px;font-weight:800;line-height:1.1}
+.ws{font-size:12px;opacity:.65;margin-top:2px;margin-bottom:16px}
+.wr{display:flex;align-items:flex-end;gap:12px}
+.wbig{font-size:64px;font-weight:900;line-height:1;letter-spacing:-3px}
+.wpct{font-size:24px;font-weight:700;margin-bottom:10px}
+.wbd{font-size:13px;opacity:.8;line-height:1.8}
+.wcb{margin-left:auto;text-align:right}
+.wcbn{font-size:22px;font-weight:800}
+.wcbl{font-size:12px;opacity:.7}
+.wpms{margin-top:14px;display:flex;gap:6px;flex-wrap:wrap}
+.pmc{background:rgba(255,255,255,.18);padding:4px 10px;border-radius:var(--r-pill);font-size:12px;font-weight:600}
+.wdec{display:none}
+/* Banners */
+.bn{margin:8px 16px 0;border-radius:10px;padding:10px 13px;font-size:13px;line-height:1.6;
+  display:flex;align-items:flex-start;gap:8px}
+.bni{font-size:14px;flex-shrink:0;margin-top:2px}
+.bn-w{background:#fffbeb;border-left:4px solid var(--yellow);color:#92400e}
+.bn-g{background:#ecfdf5;border-left:4px solid var(--green);color:#065f46}
+.bn-b{background:#eff6ff;border-left:4px solid var(--blue);color:#1e40af}
+.bn-r{background:#fef2f2;border-left:4px solid var(--red);color:#991b1b}
+/* Scenario description */
+.scen-desc{font-size:12px;color:var(--sub);background:var(--bg);border-radius:10px;
+  padding:7px 14px;margin:4px 16px 0;line-height:1.5;display:none}
+/* Section subtitle */
+.page-sub{padding:2px 16px 8px;font-size:13px;color:var(--sub)}
+/* Card list */
+.cl{padding:0 16px}
+.ci{background:#fff;border-radius:var(--r);padding:13px 14px;margin-bottom:8px;
+  display:flex;align-items:center;gap:10px;box-shadow:var(--sh)}
+.ci.dim{opacity:.5}
+.crk{width:26px;height:26px;border-radius:50%;background:var(--bg);font-size:12px;
+  font-weight:700;color:var(--sub);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.crk.g{background:#fef3c7;color:#d97706}
+.cst{width:5px;height:42px;border-radius:3px;flex-shrink:0}
+.cif{flex:1;min-width:0}
+.cin{font-size:14px;font-weight:700}
+.cib{font-size:11px;color:var(--sub);margin-top:1px}
+.cino{font-size:11px;color:var(--sub);margin-top:4px;line-height:1.4}
+.cibdgs{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.bd{font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px}
+.bd-s{background:#fef3c7;color:#92400e}
+.bd-r{background:#eff6ff;color:#1d4ed8}
+.bd-c{background:#fff7ed;color:#c2410c}
+.bd-x{background:#fef2f2;color:#dc2626}
+.bd-ok{background:#ecfdf5;color:#059669}
+.bd-pt{background:#f3f0ff;color:#7c3aed}
+.crt{flex-shrink:0;text-align:right}
+.crn{font-size:20px;font-weight:800}
+.crn.pos{color:var(--green)}.crn.z{color:var(--sub)}.crn.neg{color:var(--red)}
+.crpct{font-size:10px;font-weight:400}
+.crgr{font-size:11px;color:var(--sub);margin-top:2px}
+.crfe{font-size:10px;color:var(--red)}
+.crca{font-size:11px;color:var(--sub);margin-top:1px}
+/* My Cards */
+.mci{background:#fff;border-radius:var(--r);padding:13px 14px;margin-bottom:8px;
+  display:flex;align-items:center;gap:10px;box-shadow:var(--sh)}
+.mcs{width:5px;height:44px;border-radius:3px;flex-shrink:0}
+.mcif{flex:1;min-width:0}
+.mcn{font-size:14px;font-weight:700}
+.mcb{font-size:12px;color:var(--sub)}
+.mcm{font-size:11px;color:var(--sub);margin-top:3px}
+.mce{padding:5px 10px;background:var(--bg);border:none;border-radius:7px;cursor:pointer;
+  font-size:12px;color:var(--sub);flex-shrink:0}
+.tgl{width:46px;height:26px;border-radius:13px;background:#d1d5db;position:relative;
+  cursor:pointer;transition:background .2s;flex-shrink:0}
+.tgl.on{background:var(--green)}
+.tgl::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;
+  background:#fff;top:3px;left:3px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.tgl.on::after{left:23px}
+/* Add button */
+.addb{width:calc(100% - 32px);margin:0 16px;background:#fff;border:2px dashed var(--border);
+  border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:10px;cursor:pointer;
+  font-size:14px;color:var(--sub)}
+/* Settings */
+.sbox{margin:10px 16px;background:#fff;border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.srow{padding:14px 16px;border-bottom:1px solid var(--border)}
+.srow:last-child{border-bottom:none}
+.srt{font-size:15px;font-weight:600;margin-bottom:3px}
+.srs{font-size:12px;color:var(--sub);line-height:1.6}
+.sra{display:flex;gap:8px;margin-top:10px}
+.sbtn{flex:1;padding:8px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+.sbtn.p{background:var(--accent);color:#fff}.sbtn.s{background:var(--bg);color:var(--text)}
+.sbtn.d{background:#fee2e2;color:#dc2626}
+/* Sources list */
+.src-item{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.src-item:last-child{border-bottom:none}
+.src-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.src-info{flex:1;min-width:0}
+.src-name{font-size:13px;font-weight:700}
+.src-url{font-size:11px;color:var(--blue);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Revolut box */
+.rvbox{margin:10px 16px;background:#eff6ff;border-radius:var(--r);padding:14px;border:1px solid #bfdbfe}
+.rvt{font-size:13px;font-weight:700;color:#1e40af;margin-bottom:6px}
+.rvb{font-size:12px;color:#1e40af;line-height:1.6}
+/* Empty */
+.emp{text-align:center;padding:48px 20px;color:var(--sub)}
+.empi{font-size:52px;margin-bottom:12px}
+/* Footnote */
+.fn{padding:6px 16px;font-size:11px;color:#9ca3af;text-align:center}
+/* Modal overlay */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;
+  display:flex;align-items:flex-end;justify-content:center}
+.mo.hide{display:none}
+.md{background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:480px;
+  max-height:92vh;overflow-y:auto;padding:20px 20px calc(20px + env(safe-area-inset-bottom))}
+.mhd{width:36px;height:4px;background:#d1d5db;border-radius:2px;margin:0 auto 16px}
+.mt{font-size:18px;font-weight:800;margin-bottom:16px}
+/* Form elements */
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;
+  letter-spacing:.6px;margin-bottom:6px}
+.fi{width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:10px;
+  font-size:16px;outline:none;background:#fff;transition:border-color .15s}
+.fi:focus{border-color:var(--accent)}
+.fsel{width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:10px;
+  font-size:16px;outline:none;background:#fff;appearance:none;cursor:pointer}
+.bf{width:100%;padding:14px;border:none;border-radius:var(--r);font-size:16px;font-weight:700;cursor:pointer;margin-top:8px}
+.bf.p{background:var(--accent);color:#fff}.bf.s{background:var(--bg);color:var(--text)}
+.bf.d{background:#fee2e2;color:#dc2626}
+/* Color picker */
+.cpk{display:flex;gap:8px;flex-wrap:wrap}
+.cd{width:30px;height:30px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:transform .1s}
+.cd.sel{border-color:var(--border-strong);transform:scale(1.15)}
+/* Rate override list */
+.ro-item{background:var(--bg);border-radius:10px;padding:10px 12px;margin-bottom:6px;
+  display:flex;align-items:center;gap:10px}
+.ro-key{flex:1;font-size:13px;color:var(--sub)}
+.ro-val{font-size:16px;font-weight:800;color:var(--accent);min-width:48px;text-align:right}
+.ro-edit{padding:4px 8px;background:#fff;border:1px solid var(--border);border-radius:6px;
+  font-size:12px;cursor:pointer;color:var(--sub);flex-shrink:0}
+/* Tabs */
+.tabs{display:flex;background:var(--bg);border-radius:10px;padding:3px;margin-bottom:14px}
+.tab{flex:1;padding:8px;border:none;background:transparent;border-radius:8px;font-size:13px;
+  font-weight:600;cursor:pointer;color:var(--sub)}
+.tab.on{background:#fff;color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+/* Section separator */
+.sep{height:1px;background:var(--border);margin:12px 0}
+/* Note chips */
+.nc{display:inline-flex;align-items:center;gap:4px;background:var(--bg);border-radius:20px;
+  padding:3px 10px;font-size:11px;color:var(--sub);margin:2px}
+/* Card picker modal */
+.pk-bank{padding:8px 0 4px;font-size:11px;font-weight:700;color:var(--sub);
+  text-transform:uppercase;letter-spacing:.8px;border-top:1px solid var(--border);margin-top:6px}
+.pk-bank:first-child{border-top:none;margin-top:0;padding-top:0}
+.pk-item{display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg);
+  border-radius:10px;margin-bottom:6px;cursor:pointer;transition:background .1s;user-select:none}
+.pk-item:active{background:#ecfdf5}
+.pk-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.pk-info{flex:1;min-width:0}
+.pk-name{font-size:14px;font-weight:700}
+.pk-sub{font-size:11px;color:var(--sub);margin-top:2px}
+/* Toast */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+  background:#0D0D0D;color:#fff;padding:10px 20px;border-radius:var(--r-pill);
+  font-size:14px;font-weight:600;z-index:300;white-space:nowrap;
+  animation:toastIn .2s ease forwards}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}
+  to{opacity:1;transform:translateX(-50%) translateY(0)}}
+/* Monthly Tracker Widget */
+.trk{padding:6px 14px 10px;border-top:1px solid var(--border)}
+.trk-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.trk-label{font-size:12px;font-weight:700;color:var(--sub);letter-spacing:.3px}
+.trk-bar-wrap{height:10px;background:var(--bg);border-radius:6px;overflow:hidden;margin:2px 0 5px}
+.trk-bar{height:100%;border-radius:4px;transition:width .4s}
+.trk-bar.ok{background:var(--green)}.trk-bar.warn{background:var(--yellow)}.trk-bar.full{background:var(--red)}
+.trk-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-bottom:4px}
+.trk-next{font-size:11px;color:var(--sub)}
+.trk-btn{padding:4px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;
+  font-size:11px;cursor:pointer;color:var(--sub);font-weight:600;flex-shrink:0}
+.trk-btn.warn{background:#fffbeb;color:#92400e;border-color:#fbbf24}
+.trk-btn.full{background:#fee2e2;color:var(--red);border-color:var(--red)}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-logo">💳 刷<em>卡</em>神器</div>
+  <span style="font-size:11px;opacity:.5">資料截至 2026/05</span>
+</header>
+
+<nav class="nav">
+  <button class="nb on" id="nb-home" onclick="go('home')"><span class="nb-i">🏠</span>首頁</button>
+  <button class="nb" id="nb-cards" onclick="go('cards')"><span class="nb-i">💳</span>我的卡</button>
+  <button class="nb" id="nb-set" onclick="go('set')"><span class="nb-i">⚙️</span>設定</button>
+</nav>
+
+<!-- HOME -->
+<div id="scr-home" class="scr on">
+  <div id="first-hint" style="display:none;margin:10px 16px 0;background:#eff6ff;border-left:4px solid var(--blue);
+    border-radius:10px;padding:10px 13px;font-size:12px;color:#1e40af;line-height:1.6">
+    💡 已內建常用台灣信用卡，選地區 + 情境即可比較回饋。到「我的卡」可開啟 / 關閉個別卡片。
+    <button onclick="document.getElementById('first-hint').style.display='none';localStorage.setItem('shenqi4_seen','1')"
+      style="float:right;background:none;border:none;font-size:14px;cursor:pointer;color:#1e40af;padding:0;line-height:1">✕</button>
+  </div>
+  <div class="lbl">消費地區</div>
+  <div class="rg" id="rgrid"></div>
+  <div class="lbl">消費情境</div>
+  <div class="sw"><select class="ss" id="ssel" onchange="onSc()">
+    <option value="">— 選擇消費情境 —</option>
+  </select></div>
+  <div class="scen-desc" id="scen-ex"></div>
+  <div class="ar">
+    <span class="ac" id="acur">£</span>
+    <input type="number" class="ai" id="ainp" value="100" min="1" oninput="ST.amt=parseFloat(this.value)||100;saveST();render()">
+    <span class="amt-hint" id="atwd"></span>
+  </div>
+  <div class="qbs" id="qbs"></div>
+  <div id="res"></div>
+  <div class="fn">回饋率以各銀行官網最新公告為準 · 2026/05</div>
+</div>
+
+<!-- MY CARDS -->
+<div id="scr-cards" class="scr">
+  <div class="lbl">我持有的卡片</div>
+  <div class="page-sub">開啟的卡才納入比較</div>
+  <div class="cl" id="clist"></div>
+  <div style="height:10px"></div>
+  <button class="addb" onclick="openPicker()"><span style="font-size:22px">➕</span>新增卡片</button>
+</div>
+
+<!-- SETTINGS -->
+<div id="scr-set" class="scr">
+  <div class="lbl">設定</div>
+  <div class="sbox">
+    <div class="srow" onclick="toggleSrc()" style="cursor:pointer;user-select:none">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="srt" style="margin-bottom:0">📋 資料來源（點擊展開）</div>
+        <span id="src-icon" style="font-size:16px;color:var(--accent);font-weight:700;transition:transform .2s;display:inline-block">＋</span>
+      </div>
+      <div id="src-body" style="display:none;margin-top:10px" onclick="event.stopPropagation()">
+        <div class="srs" style="margin-bottom:8px">點擊各連結可驗證回饋率資料是否準確</div>
+        <div id="src-list"></div>
+      </div>
+    </div>
+  </div>
+  <div class="sbox">
+    <div class="srow">
+      <div class="srt">💾 匯出 / 匯入</div>
+      <div class="srs">備份卡片資料，或更新他人分享的回饋 JSON</div>
+      <div class="sra">
+        <button class="sbtn s" onclick="exp()">匯出 JSON</button>
+        <button class="sbtn p" onclick="document.getElementById('imp').click()">匯入 JSON</button>
+      </div>
+      <input type="file" id="imp" accept=".json" style="display:none" onchange="imp(event)">
+    </div>
+    <div class="srow">
+      <div class="srt">🔄 還原預設</div>
+      <div class="srs">清除自訂，恢復內建卡片資料</div>
+      <div class="sra"><button class="sbtn d" onclick="rst()">還原</button></div>
+    </div>
+    <div class="srow">
+      <div class="srt">💡 海外手續費說明</div>
+      <div class="srs">
+        台灣信用卡海外消費通常收 <strong>1.5%</strong> 外幣手續費，已自動扣除。<br>
+        例外：<strong>蝦皮聯名卡免手續費</strong>，<strong>Revolut 無手續費且無回饋</strong>。<br><br>
+        <strong>eco 月回饋上限</strong>：4% 加碼上限 NT$600／月，約消費 NT$15,000 達頂。
+        超過後仍有 1% 基本，但扣 1.5% 手續費後為 -0.5%，此時改用 Richart 玩旅刷（1.8% 淨）。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Edit/Add Card -->
+<div id="card-modal" class="mo hide" onclick="bgClick(event,'card-modal')">
+<div class="md" onclick="event.stopPropagation()">
+  <div class="mhd"></div>
+  <div class="mt" id="cmod-title">新增卡片</div>
+
+  <div class="tabs">
+    <button class="tab on" id="tab-info" onclick="switchTab('info')">基本資料</button>
+    <button class="tab" id="tab-rates" onclick="switchTab('rates')">回饋率設定</button>
+  </div>
+
+  <!-- Tab: Info -->
+  <div id="tab-info-body">
+    <div class="fg">
+      <label class="fl">銀行名稱</label>
+      <input class="fi" id="f-bank" placeholder="例：星展銀行">
+    </div>
+    <div class="fg">
+      <label class="fl">卡片名稱</label>
+      <input class="fi" id="f-name" placeholder="例：eco 永續卡">
+    </div>
+    <div class="fg">
+      <label class="fl">卡片顏色</label>
+      <div class="cpk" id="cpk"></div>
+    </div>
+    <div style="display:flex;gap:10px" class="fg">
+      <div style="flex:1">
+        <label class="fl">海外手續費 %</label>
+        <input class="fi" id="f-fee" type="number" placeholder="1.5" step="0.1" min="0">
+      </div>
+      <div style="flex:1">
+        <label class="fl">預設回饋率 %</label>
+        <input class="fi" id="f-def" type="number" placeholder="1.0" step="0.1" min="0">
+      </div>
+    </div>
+    <div class="fg">
+      <label class="fl">回饋類型</label>
+      <select class="fsel" id="f-rtype">
+        <option value="cash">現金/可兌現積點</option>
+        <option value="points">點數（可折抵帳單）</option>
+        <option value="restricted">限定通路積點（如好多金/蝦幣）</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label class="fl">回饋標籤名稱</label>
+      <input class="fi" id="f-rlabel" placeholder="例：現金積點、台新Point、好多金">
+    </div>
+    <div class="fg">
+      <label class="fl">官方網址（用於驗證）</label>
+      <input class="fi" id="f-url" type="url" placeholder="https://...">
+    </div>
+  </div>
+
+  <!-- Tab: Rates -->
+  <div id="tab-rates-body" style="display:none">
+    <div style="font-size:12px;color:var(--sub);margin-bottom:10px;line-height:1.6">
+      針對不同消費情境設定回饋率。未設定的情境使用「預設回饋率」。<br>
+      格式：情境 → 回饋 %（手續費會自動扣除）
+    </div>
+    <div id="ro-list"></div>
+    <button onclick="addRO()" style="width:100%;padding:9px;background:var(--bg);border:1px dashed var(--border);
+      border-radius:8px;font-size:13px;cursor:pointer;margin-top:4px;color:var(--sub)">
+      ＋ 新增情境回饋
+    </button>
+    <div class="sep"></div>
+    <div style="font-size:12px;color:var(--sub);margin-bottom:8px">
+      <strong>特殊上限設定</strong>（如 eco 的 4% 加碼 NT$600 月上限）：
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <div style="flex:1;min-width:140px">
+        <label class="fl">月上限回饋 NT$（0=無上限）</label>
+        <input class="fi" id="f-cap-amt" type="number" placeholder="0" min="0" style="font-size:13px;padding:8px 12px">
+      </div>
+      <div style="flex:1;min-width:140px">
+        <label class="fl">上限情境（留空=全部）</label>
+        <select class="fsel" id="f-cap-key" style="font-size:13px;padding:8px 12px"></select>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+      <div style="flex:1;min-width:140px">
+        <label class="fl">僅限加碼部分（eco式）？</label>
+        <select class="fsel" id="f-cap-bonus" style="font-size:13px;padding:8px 12px">
+          <option value="no">不是（上限是總回饋）</option>
+          <option value="yes">是（加碼有上限，基本費率不受限）</option>
+        </select>
+      </div>
+      <div style="flex:1;min-width:140px" id="f-cap-base-wrap">
+        <label class="fl">基本費率 %（加碼之外）</label>
+        <input class="fi" id="f-cap-base" type="number" placeholder="1.0" step="0.1" min="0" style="font-size:13px;padding:8px 12px">
+      </div>
+    </div>
+  </div>
+
+  <input type="hidden" id="f-id">
+  <button class="bf p" onclick="saveCard()">儲存卡片</button>
+  <button class="bf s" onclick="closeModal('card-modal')">取消</button>
+  <button class="bf d" id="del-btn" style="display:none" onclick="delCard()">刪除此卡</button>
+</div>
+</div>
+
+<!-- MODAL: Monthly Tracker -->
+<div id="trk-modal" class="mo hide" onclick="bgClick(event,'trk-modal')">
+<div class="md" onclick="event.stopPropagation()">
+  <div class="mhd"></div>
+  <div class="mt" id="trk-card-name">月消費追蹤</div>
+  <div style="font-size:12px;color:var(--sub);margin-bottom:14px;line-height:1.7;background:var(--bg);padding:10px 12px;border-radius:10px">
+    追蹤本帳期 <strong id="trk-cat-label"></strong> 消費累積<br>
+    回饋上限：<strong id="trk-cap-amt"></strong> · 消費達頂門檻：<strong id="trk-threshold"></strong>
+  </div>
+  <div class="fg">
+    <label class="fl">本帳期已消費 NT$（累積）</label>
+    <input class="fi" id="trk-spent" type="number" min="0" placeholder="0" step="100" style="font-size:20px;font-weight:700">
+  </div>
+  <div class="fg">
+    <label class="fl">帳單截止日（每月第幾日自動歸零）</label>
+    <input class="fi" id="trk-reset-day" type="number" min="1" max="31" placeholder="1">
+  </div>
+  <div style="font-size:11px;color:var(--sub);margin:-8px 0 14px;line-height:1.6" id="trk-next-reset"></div>
+  <button class="bf p" onclick="saveTracker()">儲存</button>
+  <button class="bf s" style="background:#fef3c7;color:#92400e" onclick="resetTrackerSpent()">🔄 手動歸零（新帳期）</button>
+  <button class="bf s" onclick="closeModal('trk-modal')">取消</button>
+</div>
+</div>
+
+<!-- MODAL: Edit Single Rate Override -->
+<div id="ro-modal" class="mo hide" onclick="bgClick(event,'ro-modal')">
+<div class="md" onclick="event.stopPropagation()" style="max-height:70vh">
+  <div class="mhd"></div>
+  <div class="mt">設定情境回饋率</div>
+  <div class="fg">
+    <label class="fl">消費情境</label>
+    <select class="fsel" id="ro-key"></select>
+  </div>
+  <div class="fg">
+    <label class="fl">回饋率 %（毛回饋，系統自動扣手續費）</label>
+    <input class="fi" id="ro-rate" type="number" placeholder="3.5" step="0.1" min="0">
+  </div>
+  <div class="fg">
+    <label class="fl">備注（方案名稱、條件等）</label>
+    <input class="fi" id="ro-note" placeholder="例：切換玩旅刷方案">
+  </div>
+  <div class="fg">
+    <label class="fl">需登記/設定 App？</label>
+    <select class="fsel" id="ro-reg">
+      <option value="no">不需要</option>
+      <option value="yes">需要（填寫說明）</option>
+    </select>
+  </div>
+  <div class="fg" id="ro-regnote-wrap" style="display:none">
+    <label class="fl">登記說明</label>
+    <input class="fi" id="ro-regnote" placeholder="例：CUBE App 開啟趣旅行方案">
+  </div>
+  <input type="hidden" id="ro-idx">
+  <button class="bf p" onclick="saveRO()">儲存</button>
+  <button class="bf s" onclick="closeModal('ro-modal')">取消</button>
+  <button class="bf d" id="ro-del-btn" style="display:none" onclick="delRO()">刪除此設定</button>
+</div>
+</div>
+
+<!-- MODAL: Card Picker from DB -->
+<div id="pick-modal" class="mo hide" onclick="bgClick(event,'pick-modal')">
+<div class="md" onclick="event.stopPropagation()">
+  <div class="mhd"></div>
+  <div class="mt">新增卡片</div>
+  <input class="fi" id="pk-search" placeholder="🔍 搜尋銀行或卡片名稱..."
+    oninput="pkFilter=this.value;renderPickerList()" style="margin-bottom:12px">
+  <div style="font-size:12px;color:var(--sub);margin-bottom:8px">點選即可直接加入，所有回饋資訊自動帶入</div>
+  <div id="pk-list" style="max-height:50vh;overflow-y:auto;padding-right:2px"></div>
+  <div class="sep"></div>
+  <button class="bf s" onclick="closeModal('pick-modal');openSimpleAdd()">✏️ 找不到我的卡（手動輸入）</button>
+  <button class="bf s" onclick="closeModal('pick-modal')" style="margin-top:6px">取消</button>
+</div>
+</div>
+
+<!-- MODAL: Simple manual add (bank + card name only) -->
+<div id="simple-add-modal" class="mo hide" onclick="bgClick(event,'simple-add-modal')">
+<div class="md" onclick="event.stopPropagation()" style="max-height:65vh">
+  <div class="mhd"></div>
+  <div class="mt">手動新增卡片</div>
+  <div style="font-size:13px;color:var(--sub);margin-bottom:14px;line-height:1.6">
+    輸入銀行名稱與卡片名稱，系統會以預設資料建立。<br>
+    新增後可點「編輯」更新回饋率。
+  </div>
+  <div class="fg">
+    <label class="fl">銀行名稱</label>
+    <input class="fi" id="sa-bank" placeholder="例：玉山銀行">
+  </div>
+  <div class="fg">
+    <label class="fl">卡片名稱</label>
+    <input class="fi" id="sa-name" placeholder="例：U Bear 卡">
+  </div>
+  <button class="bf p" onclick="quickAdd()">新增卡片</button>
+  <button class="bf s" onclick="closeModal('simple-add-modal')" style="margin-top:6px">取消</button>
+</div>
+</div>
+
+<script>
+/* ============================
+   RATE KEYS (scenario → card rate lookup)
+   ============================ */
+const RKEYS = [
+  {k:'overseas_physical',      l:'🌍 海外實體消費（含英國）'},
+  {k:'overseas_online',        l:'🌐 海外線上購物'},
+  {k:'overseas_subscription',  l:'📺 海外訂閱服務'},
+  {k:'overseas_apple',         l:'🍎 Apple 消費（海外）'},
+  {k:'overseas_insurance',     l:'🛡️ 海外保險費'},
+  {k:'overseas_flight',        l:'✈️ 機票（傳統航空）'},
+  {k:'overseas_flight_eva',    l:'✈️ 機票（長榮航空）'},
+  {k:'overseas_flight_budget', l:'✈️ 機票（廉航）'},
+  {k:'overseas_hotel',         l:'🏨 海外訂房平台'},
+  {k:'overseas_train',         l:'🚄 歐洲火車/高鐵'},
+  {k:'overseas_default',       l:'🌍 其他海外消費'},
+  {k:'tw_cvs',                 l:'🏪 超商（7-11/全家）'},
+  {k:'tw_shopee',              l:'🛍️ 蝦皮購物'},
+  {k:'tw_costco',              l:'🏬 Costco 好市多'},
+  {k:'tw_dining',              l:'🍜 台灣餐廳/咖啡'},
+  {k:'tw_digital',             l:'💻 台灣線上/數位'},
+  {k:'tw_insurance',           l:'🛡️ 台灣保險費'},
+  {k:'tw_flight',              l:'✈️ 台灣購票（一般航空）'},
+  {k:'tw_flight_eva',          l:'✈️ 台灣購票（長榮航空）'},
+  {k:'tw_default',             l:'🇹🇼 其他台灣消費'},
+];
+
+function rkLabel(k){ return (RKEYS.find(x=>x.k===k)||{l:k}).l; }
+
+/* ============================
+   CARD DATABASE (verified 2026/05)
+   新增卡片時從此選取，資料自動帶入
+   ============================ */
+const CARD_DB = [
+  // ─── 台新銀行 ───
+  {id:'richart',bank:'台新銀行',name:'Richart 卡',
+   color:'#E8001D',fee:1.5,rewardType:'points',rewardLabel:'台新Point（可折抵帳單）',
+   officialUrl:'https://www.taishinbank.com.tw/TSB/personal/credit/intro/overview/cg047/card001/',
+   defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     overseas_physical:{rate:3.3,note:'切換「玩旅刷」3.3%（⚠️ 需設定台新帳戶自動扣款才有 L2；無自扣帳戶僅 L1 1.3%）'},
+     overseas_online:{rate:3.3,note:'切換「玩旅刷」或「數趣刷」（⚠️ 需 L2，須設台新帳戶自扣；無自扣僅 1.3%）'},
+     overseas_subscription:{rate:3.3,note:'切換「數趣刷」方案（需 L2，須設台新帳戶自扣）'},
+     overseas_apple:{rate:3.3,note:'切換「數趣刷」方案（需 L2，須設台新帳戶自扣）'},
+     overseas_insurance:{rate:1.3,note:'保費 1.3%（需 L2；無自扣帳戶約 0.3-1%）'},
+     overseas_flight:{rate:3.3,note:'切換「玩旅刷」方案（需 L2，須設台新帳戶自扣）'},
+     overseas_hotel:{rate:3.3,note:'切換「玩旅刷」方案（需 L2，須設台新帳戶自扣）'},
+     overseas_default:{rate:3.3,note:'切換「玩旅刷」方案（需 L2，須設台新帳戶自扣）'},
+     tw_cvs:{rate:3.8,note:'切換「Pay著刷」，使用台新 Pay（四大超商適用，無單筆金額限制）'},
+     tw_dining:{rate:3.3,note:'切換「好饗刷」方案'},
+     tw_digital:{rate:3.3,note:'切換「數趣刷」方案'},
+     tw_shopee:{rate:3.3,note:'切換「數趣刷」方案'},
+     tw_costco:{rate:3.3,note:'切換「天天刷」方案'},
+     tw_insurance:{rate:1.3,note:'保費 1.3%，無上限'},
+     tw_default:{rate:3.3,note:'依類型切換對應方案'},
+   }},
+  // ─── 國泰世華 ───
+  {id:'cube',bank:'國泰世華',name:'CUBE 卡 Level 2',
+   color:'#003087',fee:1.5,rewardType:'points',rewardLabel:'小樹點（可折抵帳單）',
+   officialUrl:'https://www.cathaybk.com.tw/cathaybk/personal/product/creditcard/cards/cube/',
+   defaultRate:0.5,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     overseas_physical:{rate:3.0,reg:true,regNote:'每次消費前在 CUBE App 切換「趣旅行」（App 首頁 > CUBE 卡權益方案 > 趣旅行），每日限切一次；未切換無旅遊加碼'},
+     overseas_flight:{rate:3.0,reg:true,regNote:'CUBE App 切換「趣旅行」，航空公司 3%（含廉航），每日限切一次'},
+     overseas_flight_budget:{rate:3.0,reg:true,regNote:'CUBE App 切換「趣旅行」，廉航 3%，每日限切一次'},
+     overseas_hotel:{rate:3.0,reg:true,regNote:'CUBE App 切換「趣旅行」，Agoda/Booking.com/Hotels.com 3%，每日限切一次'},
+     overseas_online:{rate:1.0,note:'線上購物不適用趣旅行'},
+     overseas_default:{rate:1.0},
+     tw_costco:{rate:3.0,reg:true,regNote:'CUBE App 設定「好市多」類別，3% 無上限'},
+     tw_shopee:{rate:3.0,reg:true,regNote:'CUBE App 設定「蝦皮購物」類別，3% 無上限'},
+     tw_dining:{rate:3.0,reg:true,regNote:'CUBE App 設定「樂饗購」類別（餐廳），3% 無上限'},
+     tw_digital:{rate:3.0,reg:true,regNote:'CUBE App 設定「玩數位」類別（Apple、Klook、KKday 等），3% 無上限'},
+     tw_default:{rate:0.5},
+   }},
+  {id:'shopee',bank:'國泰世華',name:'蝦皮購物聯名卡',
+   color:'#EE4D2D',fee:0,rewardType:'restricted',rewardLabel:'蝦幣（限蝦皮平台使用）',
+   officialUrl:'https://www.cathaybk.com.tw/cathaybk/personal/product/creditcard/cards/shopee/',
+   defaultRate:0.5,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     tw_shopee:{rate:2.0,note:'蝦皮購物 2% 蝦幣'},
+     overseas_default:{rate:0.5,note:'海外手續費 0%（免收），回饋僅 0.5% 蝦幣'},
+     tw_default:{rate:0.5},
+   }},
+  // ─── 星展銀行 ───
+  {id:'eco',bank:'星展銀行',name:'eco 永續卡',
+   color:'#DA1710',fee:1.5,rewardType:'cash',rewardLabel:'現金積點',
+   officialUrl:'https://www.dbs.com.tw/personal-zh/cards/dbs_eco/index.html',
+   defaultRate:1.0,capKey:'overseas_physical',capAmt:600,capBonusOnly:true,capBonusPct:4,capBaseRate:1.0,
+   overrides:{
+     overseas_physical:{rate:5.0,note:'實體消費 5%，月加碼上限 NT$600，超過後僅 1%'},
+     overseas_online:{rate:1.0,note:'線上購物不適用 5%，僅基本 1%'},
+     overseas_subscription:{rate:1.0},
+     overseas_apple:{rate:1.0},
+     overseas_insurance:{rate:1.0},
+     overseas_flight:{rate:1.0,note:'線上訂票不適用 5%'},
+     overseas_hotel:{rate:1.0,note:'線上訂房不適用 5%（⭐ 季度旅遊加碼活動：Agoda/Booking.com 訂房達門檻可+3%，需在 Card+ App 登錄，2026/5–8/31）'},
+     tw_default:{rate:1.0},
+   }},
+  // ─── 富邦銀行 ───
+  {id:'costco',bank:'富邦銀行',name:'Costco 聯名卡',
+   color:'#005DAA',fee:1.5,rewardType:'restricted',rewardLabel:'好多金（限 Costco 使用）',
+   officialUrl:'https://www.fubon.com/banking/personal/credit-card/costco/',
+   defaultRate:1.0,capKey:'overseas_physical',capAmt:600,capBonusOnly:true,capBonusPct:4,capBaseRate:1.0,
+   overrides:{
+     tw_costco:{rate:2.0,note:'Costco 消費 2% 好多金'},
+     overseas_physical:{rate:5.0,note:'海外實體 5%，月加碼上限 NT$600，超過後僅 1%'},
+     tw_default:{rate:1.0},
+   }},
+  // ─── 將來銀行 ───
+  {id:'jiangjiang',bank:'將來銀行',name:'將將卡',
+   color:'#00C1B2',fee:1.5,rewardType:'points',rewardLabel:'N點（可折抵帳單）',
+   officialUrl:'https://www.nextbank.com.tw/product/point',
+   defaultRate:1.5,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     tw_default:{rate:1.5,note:'一般消費 1.5%，以官網最新公告為準'},
+     overseas_default:{rate:1.5},
+   }},
+  // ─── Mercedes ───
+  {id:'mercedes',bank:'台新銀行',name:'Mercedes-Benz 御璽卡',
+   color:'#1a1a2e',fee:1.5,rewardType:'points',rewardLabel:'台新Point',
+   officialUrl:'https://www.taishinbank.com.tw/TSB/personal/credit/intro/overview/cg006/card002/',
+   defaultRate:0.3,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     overseas_default:{rate:0.6,note:'海外 2x 積點 = 0.6%，扣費後淨回饋 -0.9%'},
+     tw_default:{rate:0.3,note:'基本 1x 積點 = 0.3%'},
+   }},
+  // ─── Revolut ───
+  {id:'revolut',bank:'Revolut',name:'英鎊帳戶（簽帳金融卡）',
+   color:'#191C1F',fee:0,rewardType:'cash',rewardLabel:'無回饋（0% 手續費）',
+   officialUrl:'https://www.revolut.com/en-GB/',isRevolut:true,
+   defaultRate:0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{}},
+  // ─── 永豐銀行 ───
+  {id:'sinopac_dual',bank:'永豐銀行',name:'幣倍卡',
+   color:'#00AEEF',fee:1.5,rewardType:'cash',rewardLabel:'現金回饋（直接折抵）',
+   officialUrl:'https://bank.sinopac.com/sinopacBT/personal/credit-card/introduction/bankcard/dual-currency-card.html',
+   defaultRate:2.0,capKey:'overseas_physical',capAmt:300,capBonusOnly:true,capBonusPct:4,capBaseRate:2.0,
+   overrides:{
+     overseas_physical:{rate:6.0,note:'精選通路 2%+4%=6%（⚠️ 一般用戶 L1 月加碼上限 NT$300，約消費 NT$7,500 達頂；月均往來資產 NT$10 萬以上升 L2 可達 NT$800）'},
+     overseas_online:{rate:6.0,note:'指定網購 Amazon/Rakuten/eBay 等 6%（含月上限，L1 NT$300）'},
+     overseas_flight:{rate:6.0,note:'航空公司購票 6%（含月上限，L1 NT$300）'},
+     overseas_flight_budget:{rate:6.0,note:'廉航購票 6%（含月上限，L1 NT$300）'},
+     overseas_hotel:{rate:6.0,note:'Booking.com/Agoda/Airbnb 等 6%（含月上限，L1 NT$300）'},
+     overseas_default:{rate:2.0,note:'非精選通路海外消費 2%，無上限'},
+     tw_default:{rate:1.0,note:'國內一般消費 1%'},
+   }},
+  // ─── 中信 ───────
+  {id:'ctbc_linepay',bank:'中國信託',name:'LINE Pay 卡',
+   color:'#06C755',fee:1.5,rewardType:'points',rewardLabel:'LINE POINTS',
+   officialUrl:'https://www.ctbcbank.com/content/twrbo/zh_tw/cc_index/cc_product/cc_introduction_index/C_LINEPay.html',
+   defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     overseas_physical:{rate:2.8,note:'海外實體 2.8%（含基本 1%+加碼 1.8%，⚠️ 限面對面刷卡，Apple Pay/Google Pay 於實體店適用）'},
+     overseas_online:{rate:1.0,note:'線上購物僅基本 1%，2.8% 加碼不適用線上消費'},
+     overseas_default:{rate:1.0,note:'非面對面消費僅基本 1%'},
+     tw_default:{rate:1.0},
+   }},
+  {id:'ctbc_cashback',bank:'中國信託',name:'現金回饋御璽卡',
+   color:'#CC0000',fee:1.5,rewardType:'cash',rewardLabel:'現金回饋',
+   officialUrl:'https://www.ctbcbank.com/content/twrbo/zh_tw/cc_index/cc_product/cc_introduction_index/B_Cashback_Signature.html',
+   defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     overseas_default:{rate:2.5,note:'⚠️ 海外 2.5% 需當月國內消費 NT$10 萬以上；NT$4-10 萬為 1.5%；NT$2-4 萬為 1%；NT$2 萬以下僅 0.5%'},
+     tw_default:{rate:1.0},
+   }},
+  // ─── 滙豐銀行 ───
+  {id:'hsbc_cashback',bank:'滙豐銀行',name:'現金回饋御璽卡',
+   color:'#DB0011',fee:1.5,rewardType:'cash',rewardLabel:'現金回饋',
+   officialUrl:'https://www.hsbc.com.tw/en-tw/credit-cards/products/cashback-signature/',
+   defaultRate:1.22,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     overseas_physical:{rate:2.22,note:'海外實體 2.22%（⚠️ 不含歐盟/英國實體通路）'},
+     overseas_online:{rate:2.22,note:'海外線上 2.22%'},
+     overseas_default:{rate:2.22},
+     tw_default:{rate:1.22},
+   }},
+  // ─── 玉山銀行 ───
+  {id:'esun_pi',bank:'玉山銀行',name:'Pi 拍錢包信用卡',
+   color:'#7B2D8B',fee:1.5,rewardType:'restricted',rewardLabel:'P幣（限 Pi 錢包使用）',
+   officialUrl:'https://www.esunbank.com/en/personal/credit-card/intro/co-branded-card/pi-card',
+   defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     overseas_default:{rate:1.0,note:'2025/3/1 起一般海外降為 1% P幣，扣費後淨 -0.5%'},
+     tw_default:{rate:1.0,note:'基本 1% P幣（需設定電子帳單）'},
+   }},
+  {id:'esun_ubear',bank:'玉山銀行',name:'U Bear 信用卡',
+   color:'#005DA0',fee:1.5,rewardType:'cash',rewardLabel:'現金回饋',
+   officialUrl:'https://www.esunbank.com/en/personal/credit-card/intro/bank-card/u-bear',
+   defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     overseas_subscription:{rate:10.0,note:'指定數位訂閱（Netflix、ChatGPT、Gemini、Steam、Nintendo、PlayStation）最高 10%，每期回饋上限 NT$100（⚠️ Spotify 不在清單；⚠️ 需設電子帳單+玉山帳戶自扣，未設定回饋為 0%）'},
+     overseas_online:{rate:3.0,note:'指定海外網購通路 3%（⚠️ 需設電子帳單+玉山帳戶自扣，未設定回饋為 0%）'},
+     overseas_default:{rate:1.0,note:'一般海外 1%（⚠️ 同樣需設電子帳單+自扣）'},
+     tw_default:{rate:1.0},
+   }},
+  {id:'esun_unicard',bank:'玉山銀行',name:'Unicard（UP 選）',
+   color:'#B8860B',fee:1.5,rewardType:'points',rewardLabel:'玉山 e point（1 點 = NT$1 可折抵帳單）',
+   officialUrl:'https://www.esunbank.com/zh-tw/personal/credit-card/intro/bank-card/unicard',
+   defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     overseas_physical:{rate:3.5,reg:true,regNote:'UP 選加碼 3.5%（⚠️ 英/歐洲 28 國實體消費無基礎 1%，整體僅 3.5%；非百大特店門市無任何回饋）；月上限 5,000 點；需訂閱 UP 選（149 e point/月，或達免費任務）；有效至 2026/06'},
+     overseas_online:{rate:4.5,reg:true,regNote:'基礎 1%+UP 選 3.5%=4.5%（線上消費不受歐洲除外限制，含 Amazon、eBay 等百大特店）；月上限 5,000 點'},
+     overseas_subscription:{rate:4.5,reg:true,regNote:'基礎 1%+UP 選 3.5%=4.5%；月上限 5,000 點'},
+     overseas_hotel:{rate:4.5,reg:true,regNote:'基礎 1%+UP 選 3.5%=4.5%（Booking.com、Agoda、Airbnb 等百大特店）；月上限 5,000 點'},
+     overseas_flight:{rate:4.5,reg:true,regNote:'基礎 1%+UP 選 3.5%=4.5%（航空公司百大特店）；月上限 5,000 點'},
+     overseas_flight_budget:{rate:4.5,reg:true,regNote:'基礎 1%+UP 選 3.5%=4.5%；月上限 5,000 點'},
+     overseas_default:{rate:1.0,note:'非百大特店一般海外 1%（⚠️ 英/歐洲實體消費基礎回饋為 0%，此類消費建議改用其他卡）'},
+     tw_default:{rate:1.0,note:'台灣一般消費 1%'},
+   }},
+  // ─── 聯邦銀行 ───
+  {id:'ubot_laidian',bank:'聯邦銀行',name:'賴點卡',
+   color:'#1FAD4E',fee:1.5,rewardType:'points',rewardLabel:'LINE POINTS',
+   officialUrl:'https://creditcards.com.tw/creditcard/ubot-line-points-credit-card/',
+   defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     overseas_default:{rate:3.0,note:'海外消費 3% LINE POINTS（無上限）'},
+     tw_default:{rate:1.0},
+   }},
+  // ─── 美國運通 ───
+  {id:'amex_gold_credit',bank:'美國運通',name:'信用金卡',
+   color:'#C9A227',fee:1.5,rewardType:'points',rewardLabel:'會員酬賓積分（可換哩程或刷卡金）',
+   officialUrl:'https://www.americanexpress.com/zh-tw/credit-cards/all-cards/',
+   defaultRate:1.2,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     overseas_default:{rate:1.5,note:'每 NT$25=1積分，積分可換哩程/刷卡金，等值約 1.5%'},
+     tw_default:{rate:1.2,note:'每 NT$30=1積分，等值約 1.2%'},
+   }},
+  {id:'amex_plat_credit',bank:'美國運通',name:'信用白金卡',
+   color:'#9B9B9B',fee:1.5,rewardType:'points',rewardLabel:'會員酬賓積分（可換哩程或刷卡金）',
+   officialUrl:'https://www.americanexpress.com/zh-tw/credit-cards/grcc-plat/',
+   defaultRate:1.2,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     overseas_default:{rate:2.0,note:'登錄後海外額外 1 積分（NT$15=1積分），等值約 2%'},
+     tw_dining:{rate:2.5,note:'指定 5 星餐廳買一送一或最高 5% 回饋'},
+     tw_default:{rate:1.2,note:'NT$30=1積分，等值約 1.2%'},
+   }},
+  {id:'amex_plat_charge',bank:'美國運通',name:'簽帳白金卡',
+   color:'#A8A9AD',fee:1.5,rewardType:'points',rewardLabel:'會員酬賓積分（可換哩程或刷卡金）',
+   officialUrl:'https://www.americanexpress.com/zh-tw/charge-cards/plat/',
+   defaultRate:1.2,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     overseas_default:{rate:2.0,note:'登錄後海外額外積分（NT$15=1積分），等值約 2%'},
+     overseas_hotel:{rate:2.5,note:'精選飯店額外禮遇 + 積分加碼'},
+     tw_default:{rate:1.2},
+   }},
+  {id:'amex_eva_gold',bank:'美國運通',name:'長榮航空簽帳金卡',
+   color:'#006747',fee:1.5,rewardType:'points',rewardLabel:'長榮無限哩程（1哩≈NT$0.5）',
+   officialUrl:'https://www.americanexpress.com/zh-tw/charge-cards/grcc-eva-gold/',
+   defaultRate:1.2,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     overseas_default:{rate:1.5,note:'海外消費 NT$20=1哩，等值約 1.5%'},
+     overseas_flight:{rate:1.5,note:'一般航空 NT$20=1哩（非長榮）'},
+     overseas_flight_eva:{rate:2.0,note:'長榮航空購票 NT$15=1哩，等值約 2%'},
+     tw_default:{rate:1.2,note:'NT$30=1哩，等值約 1.2%'},
+     tw_flight:{rate:1.2,note:'台灣購票（非長榮）NT$30=1哩'},
+     tw_flight_eva:{rate:2.0,note:'台灣購買長榮機票 NT$15=1哩，等值約 2%（無海外手續費）'},
+   }},
+  {id:'amex_green_charge',bank:'美國運通',name:'簽帳綠卡',
+   color:'#2D8A4E',fee:1.5,rewardType:'points',rewardLabel:'會員酬賓積分（可換哩程或刷卡金）',
+   officialUrl:'https://www.americanexpress.com/zh-tw/charge-cards/green/',
+   defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     overseas_default:{rate:1.2,note:'NT$30=1積分，海外略高於國內'},
+     tw_default:{rate:1.0},
+   }},
+  // ─── 永豐銀行（DAWHO）───
+  {id:'sinopac_dawho',bank:'永豐銀行',name:'DAWHO 大戶卡',
+   color:'#0055A5',fee:1.5,rewardType:'cash',rewardLabel:'現金回饋（直接折抵）',
+   officialUrl:'https://bank.sinopac.com/sinopacBT/personal/credit-card/introduction/bankcard/DAWHO.html',
+   defaultRate:2.0,capKey:'overseas_default',capAmt:1000,capBonusOnly:true,capBonusPct:4,capBaseRate:2.0,
+   overrides:{
+     overseas_default:{rate:6.0,note:'⚠️ 需大戶Plus等級：2%+4%=6%（月加碼上限 NT$1,000）；一般大戶：2%+2.5%=4.5%（月上限 NT$400）'},
+     tw_default:{rate:5.0,note:'大戶Plus 國內最高 5%（含加碼，月上限 NT$1,000）'},
+   }},
+  // ─── 台北富邦 ───
+  {id:'fubon_j',bank:'台北富邦',name:'J 卡',
+   color:'#E60012',fee:1.5,rewardType:'cash',rewardLabel:'刷卡金（現金回饋）',
+   officialUrl:'https://creditcards.com.tw/creditcard/fubon-j-japan-korea-midnight-credit-card-cashback/',
+   defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     overseas_physical:{rate:1.0,reg:true,note:'⚠️ 6% 僅限日本/韓國/泰國等指定亞洲國家，英/歐/北美實體僅基本 1%',regNote:'每季登錄一次（每月 20 日 16:00 開放，每月限量 20,000 名）；登錄頁：cardpromote.taipeifubon.com.tw/promotion/Detail?sn=C000307 或 Fubon+ App；日韓泰實體 6%，單筆滿 NT$1,000，每季加碼上限 NT$1,000；有效至 2026/09'},
+     overseas_flight:{rate:3.0,note:'日韓航空購票 3%（含廉航 Peach/Jetstar/Jeju Air 等）'},
+     overseas_flight_budget:{rate:3.0,note:'日韓廉航購票 3%（Peach、Jetstar Japan、濟州航空等）'},
+     overseas_hotel:{rate:1.0},
+     overseas_default:{rate:1.0,note:'非日韓泰地區海外 1%'},
+     tw_default:{rate:1.0},
+   }},
+  // ─── 元大銀行 ───
+  {id:'yuanta_diamond',bank:'元大銀行',name:'鑽金卡',
+   color:'#B8860B',fee:1.5,rewardType:'cash',rewardLabel:'鑽金紅利（6 個月到期，可折抵帳款）',
+   officialUrl:'https://www.yuantabank.com.tw/bank/creditCard/creditCard/in.do?id=275bac7b2e000004dddb',
+   defaultRate:1.2,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     overseas_default:{rate:2.2,note:'海外消費 2.2%（⚠️ 紅利 6 個月到期，需定期折抵）'},
+     tw_default:{rate:1.2},
+   }},
+  // ─── 滙豐銀行（Live+）───
+  {id:'hsbc_live',bank:'滙豐銀行',name:'Live+ 現金回饋卡',
+   color:'#C8102E',fee:1.5,rewardType:'cash',rewardLabel:'現金回饋',
+   officialUrl:'https://www.hsbc.com.tw/en-tw/credit-cards/products/liveplus/',
+   defaultRate:0.88,capKey:'tw_dining',capAmt:888,capBonusOnly:true,capBonusPct:3,capBaseRate:0.88,
+   overrides:{
+     tw_dining:{rate:3.88,note:'百貨/餐飲/娛樂加碼 3%，月上限 NT$888'},
+     tw_default:{rate:0.88},
+     overseas_default:{rate:0.88,note:'海外消費僅基本 0.88%，不含加碼'},
+   }},
+  // ─── 渣打銀行 ───
+  {id:'sc_linebank',bank:'渣打銀行',name:'LINE Bank 聯名卡',
+   color:'#007B5E',fee:1.5,rewardType:'cash',rewardLabel:'現金回饋',
+   officialUrl:'https://www.sc.com/tw/credit-cards/linebank-coband-card/',
+   defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     overseas_default:{rate:1.0,note:'2025/8 起海外降為 1%（原 3%），扣手續費後淨 -0.5%，建議改用 Revolut'},
+     tw_default:{rate:1.0},
+   }},
+  // ─── 第一銀行 ───
+  {id:'fcb_wonderful',bank:'第一銀行',name:'Wonderful 星璨卡',
+   color:'#004B87',fee:1.5,rewardType:'cash',rewardLabel:'現金回饋',
+   officialUrl:'https://card.firstbank.com.tw/',
+   defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     overseas_physical:{rate:3.5,note:'海外實體/日韓 3.5%（需設電子帳單+自動扣繳），無上限'},
+     overseas_default:{rate:1.0},
+     tw_default:{rate:1.5,note:'指定通路 1.5%'},
+   }},
+  // ─── Wise ───
+  {id:'wise_card',bank:'Wise',name:'多幣帳戶金融卡',
+   color:'#00B9FF',fee:0,rewardType:'cash',rewardLabel:'無回饋（銀行間匯率，0% 附加費）',
+   officialUrl:'https://wise.com/tw/',isRevolut:true,
+   defaultRate:0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{},
+   note:'Wise 使用中間市場匯率，海外消費幾乎無附加費。台灣目前無法直接申辦卡片，需海外地址。'},
+];
+
+/* ============================
+   DEFAULT CARDS (verified 2026/05)
+   ============================ */
+const DC = [
+  // ── eco 永續卡 ──────────────────────
+  {id:'eco',bank:'星展銀行',name:'eco 永續卡',color:'#DA1710',
+   fee:1.5,owned:true,rewardType:'cash',rewardLabel:'現金積點',
+   officialUrl:'https://www.dbs.com.tw/personal-zh/cards/dbs_eco/index.html',
+   defaultRate:1.0,
+   capKey:'overseas_physical', capAmt:600, capBonusOnly:true, capBonusPct:4, capBaseRate:1.0,
+   overrides:{
+     overseas_physical:{rate:5.0,note:'英/歐/日/韓/新/泰/美洲 實體消費，月回饋上限 NT$600（4%加碼），超過後僅 1%'},
+     overseas_online:{rate:1.0,note:'線上購物不適用 5%，僅基本 1%'},
+     overseas_subscription:{rate:1.0,note:'訂閱不適用 5%'},
+     overseas_apple:{rate:1.0,note:'Apple 線上不適用 5%'},
+     overseas_insurance:{rate:1.0},
+     overseas_flight:{rate:1.0,note:'線上訂票不適用 5%（如為機場實體購票則適用）'},
+     overseas_hotel:{rate:1.0,note:'線上訂房不適用 5%（⭐ 季度旅遊加碼活動：Agoda/Booking.com 訂房達門檻可+3%，需在 Card+ App 登錄，2026/5–8/31）'},
+     tw_default:{rate:1.0},
+   }},
+  // ── Richart ─────────────────────────
+  {id:'richart',bank:'台新銀行',name:'Richart 卡',color:'#E8001D',
+   fee:1.5,owned:true,rewardType:'points',rewardLabel:'台新Point（可折抵帳單）',
+   officialUrl:'https://www.taishinbank.com.tw/TSB/personal/credit/intro/overview/cg047/card001/',
+   defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     overseas_physical:{rate:3.3,note:'切換「玩旅刷」3.3%（⚠️ 需 L2，須設台新帳戶自扣；無自扣僅 1.3%）'},
+     overseas_online:{rate:3.3,note:'切換「玩旅刷」或「數趣刷」（⚠️ 需 L2；無自扣僅 1.3%）'},
+     overseas_subscription:{rate:3.3,note:'切換「數趣刷」（需 L2）'},
+     overseas_apple:{rate:3.3,note:'切換「數趣刷」（需 L2）'},
+     overseas_insurance:{rate:1.3,note:'保費 1.3%（需 L2；無自扣帳戶約 0.3-1%）'},
+     overseas_flight:{rate:3.3,note:'切換「玩旅刷」（需 L2）'},
+     overseas_hotel:{rate:3.3,note:'切換「玩旅刷」（需 L2）；⭐ 可疊加台新訂房折扣：Agoda（agoda.com/zh-tw/taishinpromo，8% off）、Hotels.com（碼 TSBH）、Expedia（碼 RICHART10，10%）、Booking.com（需從台新活動頁進入）—均需從台新官方活動頁進入才有效'},
+     overseas_default:{rate:3.3,note:'切換「玩旅刷」（需 L2）'},
+     tw_cvs:{rate:3.8,note:'切換「Pay著刷」，使用台新Pay（四大超商適用）'},
+     tw_dining:{rate:3.3,note:'切換「好饗刷」'},
+     tw_digital:{rate:3.3,note:'切換「數趣刷」；Klook 需從台新專屬頁進入才有額外折扣：klook.com/zh-TW/tetris/promo/taishinbank/'},
+     tw_shopee:{rate:3.3,note:'切換「數趣刷」'},
+     tw_costco:{rate:3.3,note:'切換「天天刷」或「大筆刷」'},
+     tw_insurance:{rate:1.3,note:'保費 1.3%，無需切換'},
+     tw_default:{rate:3.3,note:'依類型切換對應方案'},
+   }},
+  // ── CUBE L2 ─────────────────────────
+  {id:'cube',bank:'國泰世華',name:'CUBE 卡 Level 2',color:'#003087',
+   fee:1.5,owned:true,rewardType:'points',rewardLabel:'小樹點（可折抵帳單）',
+   officialUrl:'https://www.money101.com.tw/blog/%E5%9C%8B%E6%B3%B0%E4%B8%96%E8%8F%AFcube%E5%8D%A1',
+   defaultRate:0.5,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     overseas_physical:{rate:3.0,reg:true,regNote:'每次消費前在 CUBE App 切換「趣旅行」（App 首頁 > CUBE 卡權益方案 > 趣旅行），每日限切一次；未切換無旅遊加碼'},
+     overseas_flight:{rate:3.0,reg:true,regNote:'CUBE App 切換「趣旅行」，航空公司 3%（含廉航），每日限切一次'},
+     overseas_flight_budget:{rate:3.0,reg:true,regNote:'CUBE App 切換「趣旅行」，廉航 3%，每日限切一次'},
+     overseas_hotel:{rate:3.0,reg:true,regNote:'CUBE App 切換「趣旅行」，Agoda/Booking.com/Hotels.com 3%，每日限切一次'},
+     overseas_online:{rate:1.0,note:'線上購物趣旅行不適用，回 1%'},
+     overseas_subscription:{rate:1.0},
+     overseas_apple:{rate:1.0,note:'Apple 線上不適用趣旅行'},
+     overseas_insurance:{rate:1.0},
+     overseas_default:{rate:1.0},
+     tw_costco:{rate:3.0,reg:true,regNote:'CUBE App 設定「好市多」類別，3% 無上限'},
+     tw_shopee:{rate:3.0,reg:true,regNote:'CUBE App 設定「蝦皮購物」類別，3% 無上限'},
+     tw_dining:{rate:3.0,reg:true,regNote:'CUBE App 設定「樂饗購」類別（餐廳），3% 無上限'},
+     tw_digital:{rate:3.0,reg:true,regNote:'CUBE App 設定「玩數位」類別（Apple、Klook、KKday 等），3% 無上限'},
+     tw_cvs:{rate:3.0,reg:true,regNote:'CUBE App 設定對應類別，最多選 3 類'},
+     tw_default:{rate:0.5},
+   }},
+  // ── 蝦皮聯名卡 ──────────────────────
+  {id:'shopee',bank:'國泰世華',name:'蝦皮購物聯名卡',color:'#EE4D2D',
+   fee:0,owned:true,rewardType:'restricted',rewardLabel:'蝦幣（限蝦皮使用）',
+   officialUrl:'https://help.shopee.tw/portal/4/article/80312',
+   defaultRate:0.5,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     tw_shopee:{rate:2.0,note:'蝦皮站內消費最高 2% 蝦幣'},
+     tw_cvs:{rate:2.0},
+     overseas_physical:{rate:0.5,note:'0.5% 蝦幣 + 免手續費（蝦幣僅能用於蝦皮）'},
+     overseas_online:{rate:0.5,note:'蝦幣 + 免手續費'},
+     overseas_default:{rate:0.5},
+     tw_default:{rate:0.5},
+   }},
+  // ── Costco 富邦 ──────────────────────
+  {id:'costco',bank:'富邦銀行',name:'Costco 聯名卡',color:'#005DAA',
+   fee:1.5,owned:true,rewardType:'restricted',rewardLabel:'好多金（限 Costco 折抵）',
+   officialUrl:'https://creditcards.com.tw/creditcard/fubon-costco-credit-card/',
+   defaultRate:1.0,
+   capKey:'overseas_physical',capAmt:600,capBonusOnly:true,capBonusPct:4,capBaseRate:1.0,
+   overrides:{
+     tw_costco:{rate:2.0,note:'Costco 賣場 2%（線上 3%）好多金，只能折抵 Costco 消費'},
+     overseas_physical:{rate:5.0,note:'海外實體 5%（⚠️ 每月 1 日 00:00 搶登錄，限量 50,000 名；登錄頁：cardpromote.taipeifubon.com.tw/promotion/Detail?sn=C000270 或 Fubon+ App；搶不到僅 1%；好多金只能折抵 Costco），月加碼上限 NT$600'},
+     tw_default:{rate:1.0},
+     overseas_default:{rate:1.0},
+   }},
+  // ── 將將卡 ──────────────────────────
+  {id:'jiangjiang',bank:'將來銀行',name:'將將卡',color:'#00C1B2',
+   fee:1.5,owned:true,rewardType:'points',rewardLabel:'N點（可折抵帳單）',
+   officialUrl:'https://www.nextbank.com.tw/product/point',
+   defaultRate:1.5,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     tw_default:{rate:1.5,note:'一般消費 1.5%，以官網最新公告為準'},
+     overseas_physical:{rate:1.5,note:'海外可能有促銷加碼，請至官網確認'},
+     overseas_default:{rate:1.5},
+   }},
+  // ── Mercedes 御璽卡 ──────────────────
+  {id:'mercedes',bank:'台新銀行',name:'Mercedes-Benz 御璽卡',color:'#1a1a2e',
+   fee:1.5,owned:true,rewardType:'points',rewardLabel:'台新Point（Mercedes 積點）',
+   officialUrl:'https://www.taishinbank.com.tw/TSB/personal/credit/intro/overview/cg006/card002/',
+   defaultRate:0.3,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{
+     overseas_physical:{rate:0.6,note:'海外 2倍點 = 0.6%，扣手續費後淨 -0.9%，⚠️ 不建議海外使用'},
+     overseas_default:{rate:0.6},
+     tw_default:{rate:0.3,note:'一般消費 1倍點 = 0.3%'},
+   }},
+  // ── Revolut ─────────────────────────
+  {id:'revolut',bank:'Revolut',name:'Revolut 簽帳卡',color:'#0075EB',
+   fee:0,owned:true,rewardType:'cash',rewardLabel:'直接英鎊消費',
+   officialUrl:'https://www.revolut.com/en-GB/',
+   defaultRate:0,isRevolut:true,
+   capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   overrides:{}},
+];
+
+/* ============================
+   REGIONS & SCENARIOS
+   ============================ */
+const REGIONS=[
+  {id:'uk', l:'英國', f:'🇬🇧', cur:'£',  r:40,  def:true},
+  {id:'tw', l:'台灣', f:'🇹🇼', cur:'NT$',r:1},
+  {id:'jp', l:'日本', f:'🇯🇵', cur:'¥',  r:0.22},
+  {id:'kr', l:'韓國', f:'🇰🇷', cur:'₩',  r:0.023},
+  {id:'eu', l:'歐盟', f:'🇪🇺', cur:'€',  r:43},
+  {id:'na', l:'北美', f:'🇺🇸', cur:'$',  r:31},
+  {id:'sea',l:'東南亞',f:'🌏',cur:'$',   r:22},
+  {id:'cnh',l:'中港澳',f:'🇨🇳',cur:'¥',  r:4.2},
+];
+
+const SC={
+  uk:[
+    {id:'uk_sup', l:'🛒 超市',ex:'Asda、Tesco、Sainsbury\'s、Lidl、Aldi、Waitrose',rk:'overseas_physical'},
+    {id:'uk_rst', l:'🍽️ 餐廳/咖啡',ex:'餐廳、Costa、Pret a Manger、Starbucks UK',rk:'overseas_physical'},
+    {id:'uk_amz', l:'📦 Amazon UK',ex:'amazon.co.uk 線上購物',rk:'overseas_online'},
+    {id:'uk_apl', l:'🍎 Apple 消費',ex:'Apple.com、App Store、iCloud、iTunes',rk:'overseas_apple'},
+    {id:'uk_trn', l:'🚇 交通',ex:'TfL 地鐵/公車、National Rail、Uber UK',rk:'overseas_physical'},
+    {id:'uk_fue', l:'⛽ 加油站',ex:'BP、Shell、Tesco Fuel',rk:'overseas_physical'},
+    {id:'uk_ins', l:'🛡️ 保險費',ex:'汽車險、房屋險、旅遊險',rk:'overseas_insurance'},
+    {id:'uk_sub', l:'📺 串流訂閱',ex:'Netflix、Spotify、Disney+、YouTube Premium（MCC 5815，適用數位訂閱加碼）',rk:'overseas_subscription'},
+    {id:'uk_gym', l:'🏋️ 健身房',ex:'PureGym、David Lloyd、Virgin Active（MCC 7997，不算數位訂閱，按一般線上消費計）',rk:'overseas_online'},
+    {id:'uk_pha', l:'💊 藥局/保健',ex:'Boots、Superdrug',rk:'overseas_physical'},
+    {id:'uk_ret', l:'🛍️ 百貨/購物',ex:'John Lewis、M&S、H&M、Zara、Harvey Nichols',rk:'overseas_physical'},
+    {id:'uk_flt_fs',  l:'✈️ 傳統航空（BA、Virgin、國泰、阿提哈德等）',            ex:'BA、Virgin Atlantic、國泰（Cathay）、阿提哈德（Etihad）、Iberia、TAP、Emirates 等',rk:'overseas_flight'},
+    {id:'uk_flt_bgt', l:'✈️ 廉航（Ryanair、EasyJet、Vueling 等）',                  ex:'Ryanair、EasyJet、Vueling、Norwegian、Wizz Air、Volotea、Jet2、Transavia',rk:'overseas_flight_budget'},
+    {id:'uk_trn_es',  l:'🚄 Eurostar（歐洲之星）',  ex:'倫敦→巴黎/布魯塞爾/阿姆斯特丹',rk:'overseas_train'},
+    {id:'uk_htl', l:'🏨 訂房',ex:'Booking.com、Airbnb、Hotels.com',rk:'overseas_hotel'},
+  ],
+  tw:[
+    {id:'tw_cvs', l:'🏪 便利商店',ex:'7-Eleven、全家',rk:'tw_cvs'},
+    {id:'tw_spe', l:'🛍️ 蝦皮購物',ex:'Shopee',rk:'tw_shopee'},
+    {id:'tw_cos', l:'🏬 Costco 好市多',ex:'Costco',rk:'tw_costco'},
+    {id:'tw_din', l:'🍽️ 餐廳/咖啡/速食',ex:'星巴克、路易莎、麥當勞、肯德基、摩斯、必勝客、達美樂',rk:'tw_dining'},
+    {id:'tw_ueb', l:'🛵 外送平台',ex:'Uber Eats、Foodpanda',rk:'tw_default'},
+    {id:'tw_cin', l:'🎬 電影院',ex:'威秀、國賓、華威',rk:'tw_default'},
+    {id:'tw_px',  l:'🛒 全聯',ex:'全聯福利中心',rk:'tw_default'},
+    {id:'tw_klook',l:'🎟️ Klook',ex:'客路旅遊，台幣結帳。台新 Richart 持卡人有 3.3% 加碼合作（klook.com/zh-TW/tetris/promo/taishinbank/）',rk:'tw_digital'},
+    {id:'tw_kkd', l:'🎟️ KKday',ex:'旅遊體驗/活動門票，台幣結帳',rk:'tw_digital'},
+    {id:'tw_apl', l:'🍎 Apple Store TW',ex:'Apple.com TW、App Store、iCloud+',rk:'tw_digital'},
+    {id:'tw_xbd', l:'🛒 跨境購物',ex:'淘寶、天貓、Temu、酷澎（Coupang）—以外幣結帳，含 1.5% 海外手續費',rk:'overseas_online'},
+    {id:'tw_ride',l:'🚕 Uber/共享交通',ex:'Uber TW、Yoxi、GoShare、iRent',rk:'tw_default'},
+    {id:'tw_trn', l:'🚌 大眾交通',ex:'台灣高鐵、台鐵、國光/統聯/葛瑪蘭客運',rk:'tw_default'},
+    {id:'tw_fue', l:'⛽ 加油站',ex:'中油、台塑、殼牌',rk:'tw_default'},
+    {id:'tw_ins', l:'🛡️ 保險費',ex:'壽險、車險、意外險',rk:'tw_insurance'},
+    {id:'tw_uti', l:'📄 水電費/帳單',ex:'台電、自來水',rk:'tw_default'},
+    {id:'tw_flt_eva', l:'✈️ 長榮航空',ex:'EVA Air 官網/代理商購票，台幣結帳',rk:'tw_flight_eva'},
+    {id:'tw_flt_fs',  l:'✈️ 全服務航空（CI、JX、CX 等）',ex:'中華航空（CI）、星宇（JX）、國泰（CX）等，台幣結帳',rk:'tw_flight'},
+    {id:'tw_flt_bgt', l:'✈️ 廉航（酷航、台虎、亞航等）',ex:'酷航 (Scoot)、台虎、捷星、亞航（AirAsia），台幣結帳',rk:'tw_flight'},
+  ],
+  jp:[
+    {id:'jp_phy',l:'🏪 實體消費',ex:'便利店、餐廳、超市、藥妝',rk:'overseas_physical'},
+    {id:'jp_onl',l:'📦 網路購物',ex:'樂天、Amazon JP、ZOZOTOWN',rk:'overseas_online'},
+    {id:'jp_flt_fs',  l:'✈️ 傳統航空（JAL、ANA）',  ex:'JAL（日航）、ANA（全日空）',rk:'overseas_flight'},
+    {id:'jp_flt_bgt', l:'✈️ 廉航（Peach、Jetstar、Spring 等）',        ex:'Peach、Jetstar Japan、Spring Japan、Zip Air、Skymark',rk:'overseas_flight_budget'},
+    {id:'jp_htl',l:'🏨 訂房',ex:'Booking.com、一休.com、Agoda',rk:'overseas_hotel'},
+  ],
+  kr:[
+    {id:'kr_phy',l:'🏪 實體消費',ex:'便利店、餐廳、百貨',rk:'overseas_physical'},
+    {id:'kr_onl',l:'📦 網路購物',ex:'Coupang、Naver',rk:'overseas_online'},
+    {id:'kr_flt_fs',  l:'✈️ 傳統航空（大韓、韓亞）',  ex:'大韓航空（Korean Air）、韓亞航空（Asiana）',rk:'overseas_flight'},
+    {id:'kr_flt_bgt', l:'✈️ 廉航（濟州、T\'way、Jin Air 等）',        ex:'濟州航空、T\'way、Air Seoul、Jin Air、Eastar Jet',rk:'overseas_flight_budget'},
+    {id:'kr_htl',l:'🏨 訂房',ex:'各訂房平台',rk:'overseas_hotel'},
+  ],
+  eu:[
+    {id:'eu_phy',l:'🏪 實體消費',ex:'超市、餐廳、購物',rk:'overseas_physical'},
+    {id:'eu_onl',l:'📦 網路購物',ex:'ASOS、Zalando、Farfetch',rk:'overseas_online'},
+    {id:'eu_flt_eva', l:'✈️ 長榮航空 (EVA Air)',ex:'歐洲→台北，在歐洲購票',rk:'overseas_flight_eva'},
+    {id:'eu_flt_fs',  l:'✈️ 傳統航空（CI、Lufthansa、法航、KLM 等）',ex:'中華航空（CI）、Lufthansa、Air France、KLM、Turkish Airlines、Swiss、Iberia',rk:'overseas_flight'},
+    {id:'eu_flt_bgt', l:'✈️ 廉航（Ryanair、EasyJet、Wizz Air 等）',                ex:'Ryanair、EasyJet、Vueling、Wizz Air、Norwegian、Transavia、Pegasus、Volotea',rk:'overseas_flight_budget'},
+    {id:'eu_trn',     l:'🚄 歐洲高鐵/鐵路',       ex:'TGV（法）、ICE（德）、Thalys、Frecciarossa（義）',rk:'overseas_train'},
+    {id:'eu_htl',l:'🏨 訂房',ex:'各訂房平台',rk:'overseas_hotel'},
+  ],
+  na:[
+    {id:'na_phy',l:'🏪 實體消費',ex:'超市、餐廳、Outlet',rk:'overseas_physical'},
+    {id:'na_onl',l:'📦 網路購物',ex:'Amazon US、Walmart、Target',rk:'overseas_online'},
+    {id:'na_flt_fs',  l:'✈️ 傳統航空（United、AA、Delta 等）',  ex:'United Airlines、American Airlines、Delta、Air Canada',rk:'overseas_flight'},
+    {id:'na_flt_bgt', l:'✈️ 廉航（Southwest、Spirit 等）',ex:'Southwest、Spirit、Frontier、WestJet、Allegiant、Sun Country',rk:'overseas_flight_budget'},
+    {id:'na_gym', l:'🏋️ 健身房',ex:'Planet Fitness、Equinox、LA Fitness（MCC 7997，按一般線上消費計）',rk:'overseas_online'},
+    {id:'na_htl', l:'🏨 訂房',ex:'各訂房平台',rk:'overseas_hotel'},
+  ],
+  sea:[
+    {id:'sea_phy',l:'🏪 實體消費',ex:'超市、餐廳、百貨',rk:'overseas_physical'},
+    {id:'sea_onl',l:'📦 網路購物',ex:'Shopee、Lazada',rk:'overseas_online'},
+    {id:'sea_flt_fs',  l:'✈️ 傳統航空（新航、泰航、馬航等）',  ex:'新加坡航空（SQ）、泰國航空（TG）、馬來西亞航空（MH）、越南航空（VN）',rk:'overseas_flight'},
+    {id:'sea_flt_bgt', l:'✈️ 廉航（AirAsia、Scoot、VietJet 等）',        ex:'AirAsia、Scoot、Lion Air、VietJet、Cebu Pacific、Nok Air、Batik Air',rk:'overseas_flight_budget'},
+    {id:'sea_htl',l:'🏨 訂房',ex:'Agoda、Booking',rk:'overseas_hotel'},
+  ],
+  cnh:[
+    {id:'cnh_phy',l:'🏪 實體消費',ex:'百貨、餐廳',rk:'overseas_physical'},
+    {id:'cnh_onl',l:'📦 網路購物',ex:'淘寶、天貓、JD',rk:'overseas_online'},
+    {id:'cnh_ali',l:'📱 支付寶消費',ex:'微信/支付寶',rk:'overseas_online'},
+    {id:'cnh_flt_fs',  l:'✈️ 傳統航空（國泰、國航、東航等）',  ex:'國泰（Cathay）、中國國際航空（CA）、中國東方航空（MU）、南方航空（CZ）',rk:'overseas_flight'},
+    {id:'cnh_flt_bgt', l:'✈️ 廉航（香港快運、春秋等）',        ex:'香港快運（HK Express）、大灣區航空（Greater Bay）、春秋航空、西部航空',rk:'overseas_flight_budget'},
+    {id:'cnh_htl',l:'🏨 訂房',ex:'各訂房平台',rk:'overseas_hotel'},
+  ],
+};
+
+/* ============================
+   STATE
+   ============================ */
+let cards=[], ST={region:'uk',scen:null,amt:100,qbSel:null};
+const COLORS=['#DA1710','#E8001D','#003087','#EE4D2D','#005DAA','#00C1B2',
+  '#1a1a2e','#0075EB','#06c755','#FF6B35','#7c3aed','#f59e0b','#059669','#e94560'];
+let editROList=[]; // temp rate overrides during card edit
+let editROSelIdx=-1; // which RO is being edited in ro-modal
+
+function loadCards(){
+  try{const s=localStorage.getItem('shenqi4');if(s){const p=JSON.parse(s);if(Array.isArray(p)&&p.length&&p[0].id)cards=p;}}catch(e){}
+  if(!cards.length)cards=JSON.parse(JSON.stringify(DC));
+  cards.forEach(c=>{initTracker(c);autoResetCheck(c);});
+  // Restore last ST state
+  try{const st=localStorage.getItem('shenqi4_st');if(st){const p=JSON.parse(st);ST.region=p.region||'uk';ST.scen=p.scen||null;ST.amt=p.amt||100;}}catch(e){}
+}
+function save(){localStorage.setItem('shenqi4',JSON.stringify(cards));}
+function saveST(){localStorage.setItem('shenqi4_st',JSON.stringify({region:ST.region,scen:ST.scen,amt:ST.amt}));}
+
+/* ============================
+   MONTHLY TRACKER
+   ============================ */
+function initTracker(card){
+  if(card.capAmt>0&&!card.tracker){
+    card.tracker={resetDay:card._defaultResetDay||1,spent:0,lastResetYM:''};
+  }
+}
+function autoResetCheck(card){
+  if(!card.capAmt||!card.tracker)return;
+  const now=new Date();
+  const d=now.getDate();
+  const rd=card.tracker.resetDay||1;
+  let pY=now.getFullYear(),pM=now.getMonth();
+  if(d<rd){pM--;if(pM<0){pM=11;pY--;}}
+  const pYM=`${pY}-${String(pM+1).padStart(2,'0')}`;
+  if(card.tracker.lastResetYM!==pYM){
+    card.tracker.spent=0;
+    card.tracker.lastResetYM=pYM;
+  }
+}
+function nextResetDate(resetDay){
+  const now=new Date();
+  const d=now.getDate();
+  if(d<resetDay)return new Date(now.getFullYear(),now.getMonth(),resetDay);
+  return new Date(now.getFullYear(),now.getMonth()+1,resetDay);
+}
+function fmtResetDate(resetDay){
+  const next=nextResetDate(resetDay);
+  const days=Math.max(1,Math.ceil((next-new Date())/86400000));
+  return `${next.getMonth()+1}/${next.getDate()}（還有 ${days} 天）`;
+}
+function trkCapBonus(card,spent){
+  if(!card.capBonusPct)return 0;
+  return Math.min(spent*card.capBonusPct/100,card.capAmt);
+}
+function trkRemaining(card){
+  // remaining cashback capacity (NT$)
+  const spent=card.tracker?.spent||0;
+  const prior=card.capBonusOnly?trkCapBonus(card,spent):Math.min(spent*(card.defaultRate||0)/100,card.capAmt);
+  return Math.max(0,card.capAmt-prior);
+}
+function trkThreshold(card){
+  // spending (NT$) needed to exhaust cap
+  const bp=card.capBonusOnly?card.capBonusPct:card.defaultRate;
+  return bp>0?Math.round(card.capAmt/bp*100):0;
+}
+function trkPct(card){
+  const t=trkThreshold(card);
+  if(!t)return 0;
+  return Math.min(100,Math.round((card.tracker?.spent||0)/t*100));
+}
+function renderTrackerWidget(card){
+  if(!card.capAmt||!card.tracker)return'';
+  const spent=card.tracker.spent||0;
+  const pct=trkPct(card);
+  const barClass=pct>=100?'full':pct>=70?'warn':'ok';
+  const remaining=trkRemaining(card);
+  const bp=card.capBonusOnly?card.capBonusPct:card.defaultRate;
+  const remainSpend=bp>0?Math.round(remaining/bp*100):0;
+  const resetDay=card.tracker.resetDay||1;
+  const capKeyLabel=card.capKey?rkLabel(card.capKey):'全部消費';
+  const btnCls=pct>=100?' full':pct>=70?' warn':'';
+  return`<div class="trk">
+    <div class="trk-row">
+      <span class="trk-label">📊 ${capKeyLabel} · 月上限 NT$${card.capAmt}</span>
+      <button class="trk-btn${btnCls}" onclick="openTracker('${card.id}')">更新</button>
+    </div>
+    <div class="trk-bar-wrap"><div class="trk-bar ${barClass}" style="width:${pct}%"></div></div>
+    <div class="trk-meta">
+      <span>已刷 NT$${spent.toLocaleString()} / NT$${trkThreshold(card).toLocaleString()}</span>
+      <span>${pct>=100?'⛔ 加碼已滿':`剩可刷 ≈ NT$${remainSpend.toLocaleString()}`}</span>
+    </div>
+    <div class="trk-next">🔄 下次重置：${fmtResetDate(resetDay)}</div>
+  </div>`;
+}
+
+let trackerCardId=null;
+function openTracker(cardId){
+  trackerCardId=cardId;
+  const card=cards.find(c=>c.id===cardId);
+  if(!card)return;
+  initTracker(card);autoResetCheck(card);
+  document.getElementById('trk-card-name').textContent=`${card.bank} ${card.name}`;
+  document.getElementById('trk-cat-label').textContent=card.capKey?rkLabel(card.capKey):'全部消費';
+  document.getElementById('trk-spent').value=card.tracker.spent||0;
+  document.getElementById('trk-reset-day').value=card.tracker.resetDay||1;
+  document.getElementById('trk-cap-amt').textContent=`NT$${card.capAmt}`;
+  document.getElementById('trk-threshold').textContent=`NT$${trkThreshold(card).toLocaleString()}`;
+  updateTrkResetLabel();
+  document.getElementById('trk-reset-day').oninput=updateTrkResetLabel;
+  document.getElementById('trk-modal').classList.remove('hide');
+}
+function updateTrkResetLabel(){
+  const d=parseInt(document.getElementById('trk-reset-day').value)||1;
+  document.getElementById('trk-next-reset').textContent=`下次重置：${fmtResetDate(d)}`;
+}
+function saveTracker(){
+  const card=cards.find(c=>c.id===trackerCardId);
+  if(!card)return;
+  initTracker(card);
+  card.tracker.spent=Math.max(0,parseFloat(document.getElementById('trk-spent').value)||0);
+  card.tracker.resetDay=Math.min(31,Math.max(1,parseInt(document.getElementById('trk-reset-day').value)||1));
+  // Stamp lastResetYM to current period so autoResetCheck won't overwrite the user's input
+  const _now=new Date();const _d=_now.getDate();const _rd=card.tracker.resetDay;
+  let _pY=_now.getFullYear(),_pM=_now.getMonth();
+  if(_d<_rd){_pM--;if(_pM<0){_pM=11;_pY--;}}
+  card.tracker.lastResetYM=`${_pY}-${String(_pM+1).padStart(2,'0')}`;
+  autoResetCheck(card);
+  save();renderCards();render();
+  closeModal('trk-modal');showToast('✅ 已更新消費紀錄');
+}
+function resetTrackerSpent(){
+  const card=cards.find(c=>c.id===trackerCardId);
+  if(!card||!card.tracker)return;
+  card.tracker.spent=0;
+  // Force lastResetYM to current period
+  const now=new Date();const d=now.getDate();const rd=card.tracker.resetDay||1;
+  let pY=now.getFullYear(),pM=now.getMonth();
+  if(d<rd){pM--;if(pM<0){pM=11;pY--;}}
+  card.tracker.lastResetYM=`${pY}-${String(pM+1).padStart(2,'0')}`;
+  save();renderCards();render();
+  document.getElementById('trk-spent').value=0;
+  showToast('✅ 已歸零');
+}
+
+/* ============================
+   NAV
+   ============================ */
+function go(id){
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
+  document.getElementById('scr-'+id).classList.add('on');
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  const m={home:'nb-home',cards:'nb-cards',set:'nb-set'};
+  if(m[id])document.getElementById(m[id]).classList.add('on');
+  if(id==='cards')renderCards();
+  if(id==='set')renderSources();
+}
+
+/* ============================
+   REGIONS
+   ============================ */
+function renderRegions(){
+  document.getElementById('rgrid').innerHTML=REGIONS.map(r=>
+    `<button class="rb ${r.id===ST.region?'sel':''}" onclick="setR('${r.id}')">
+      <span class="rf">${r.f}</span><span class="rl">${r.l}</span>
+    </button>`).join('');
+}
+function setR(id){
+  ST.region=id; ST.scen=null;
+  const ex=document.getElementById('scen-ex');
+  ex.style.display='none'; ex.textContent='';
+  renderRegions(); renderScenarios(); renderQuickAmts(); updateTWD();
+  const r=REGIONS.find(x=>x.id===id);
+  document.getElementById('acur').textContent=r.cur;
+  saveST();render();
+}
+
+/* ============================
+   SCENARIOS
+   ============================ */
+function renderScenarios(){
+  const list=SC[ST.region]||[];
+  const sel=document.getElementById('ssel');
+  sel.innerHTML='<option value="">— 選擇消費情境 —</option>'+
+    list.map(s=>`<option value="${s.id}">${s.l}</option>`).join('');
+  if(ST.scen&&list.find(s=>s.id===ST.scen))sel.value=ST.scen;
+  else ST.scen=null;
+}
+function onSc(){
+  ST.scen=document.getElementById('ssel').value||null;
+  const list=SC[ST.region]||[];
+  const scen=list.find(s=>s.id===ST.scen);
+  const ex=document.getElementById('scen-ex');
+  if(scen&&scen.ex){ex.textContent=scen.ex;ex.style.display='block';}
+  else{ex.style.display='none';}
+  saveST();render();
+  if(ST.scen){
+    setTimeout(()=>{document.getElementById('res').scrollIntoView({behavior:'smooth',block:'start'});},100);
+  }
+}
+function sa(v){document.getElementById('ainp').value=v;ST.amt=v;ST.qbSel=v;updateTWD();saveST();render();renderQuickAmts();}
+function updateTWD(){
+  const reg=REGIONS.find(r=>r.id===ST.region);
+  const amt=Math.max(1,parseFloat(document.getElementById('ainp').value)||100);
+  const twd=document.getElementById('atwd');
+  if(reg&&reg.id!=='tw'&&reg.r!==1){
+    twd.textContent=`≈ NT$${Math.round(amt*reg.r).toLocaleString()}`;
+  } else {twd.textContent='';}
+}
+function renderQuickAmts(){
+  const reg=REGIONS.find(r=>r.id===ST.region);
+  const amts={
+    tw:   [200,500,1000,3000,5000],
+    uk:   [20,50,100,300,500],
+    eu:   [20,50,100,300,500],
+    na:   [20,50,100,300,500],
+    jp:   [500,1000,3000,5000,10000],
+    kr:   [5000,10000,30000,50000,100000],
+    sea:  [20,50,100,300,500],
+    cnh:  [50,100,300,500,1000],
+  };
+  const list=amts[reg?.id]||[50,100,300,500,1000];
+  document.getElementById('qbs').innerHTML=list.map(v=>
+    `<button class="qb${v===ST.qbSel?' sel':''}" onclick="sa(${v})">${v.toLocaleString()}</button>`).join('');
+}
+
+/* ============================
+   RATE CALCULATION (core)
+   ============================ */
+function calcCard(card,rk,isTW,amtTWD){
+  if(card.isRevolut)return{gross:0,fee:0,net:0,cashback:0,capped:false,isRevolut:true};
+
+  // Resolve override
+  let ov=card.overrides[rk];
+  if(!ov&&!isTW)ov=card.overrides['overseas_default'];
+  if(!ov&&isTW)ov=card.overrides['tw_default'];
+  const rate=ov?ov.rate:card.defaultRate;
+  const fee=rk.startsWith('overseas_')?card.fee:0;
+  const note=ov?ov.note||null:null;
+  const reg=ov?ov.reg||false:false;
+  const regNote=ov?ov.regNote||null:null;
+  const scheme=ov?ov.note||null:null; // use note field for scheme info too
+
+  // Cap logic
+  let cashback=amtTWD*rate/100;
+  let capped=false;
+  let trackerCapped=false;
+
+  const capApplies=card.capAmt>0&&(!card.capKey||card.capKey===rk);
+  const spentTWD=capApplies&&card.tracker?(card.tracker.spent||0):0;
+
+  if(capApplies){
+    if(card.capBonusOnly){
+      // Remaining bonus cap after prior spending
+      const priorBonus=Math.min(spentTWD*card.capBonusPct/100,card.capAmt);
+      const remBonus=Math.max(0,card.capAmt-priorBonus);
+      if(remBonus<=0){
+        // Prior spending already exhausted the bonus — only base rate
+        trackerCapped=true;capped=true;
+        cashback=amtTWD*card.capBaseRate/100;
+      }else{
+        const thisBonusCB=Math.min(amtTWD*card.capBonusPct/100,remBonus);
+        const thisBaseCB=amtTWD*card.capBaseRate/100;
+        cashback=thisBonusCB+thisBaseCB;
+        capped=thisBonusCB<amtTWD*card.capBonusPct/100;
+      }
+    }else{
+      const priorCB=Math.min(spentTWD*rate/100,card.capAmt);
+      const remCap=Math.max(0,card.capAmt-priorCB);
+      if(remCap<=0){
+        trackerCapped=true;capped=true;cashback=0;
+      }else{
+        cashback=Math.min(amtTWD*rate/100,remCap);
+        capped=cashback<amtTWD*rate/100;
+      }
+    }
+  }
+
+  const effectiveGross=amtTWD>0?cashback/amtTWD*100:0;
+  const net=effectiveGross-fee;
+
+  return{gross:rate,fee,net,cashback,capped,trackerCapped,note,reg,regNote,rateKey:rk,
+    capAmt:card.capAmt,isRestricted:card.rewardType==='restricted',rewardLabel:card.rewardLabel};
+}
+
+/* ============================
+   RENDER RESULTS
+   ============================ */
+function render(){
+  const area=document.getElementById('res');
+  ST.amt=Math.max(1,parseFloat(document.getElementById('ainp').value)||100);
+  updateTWD();
+
+  if(!ST.scen){
+    area.innerHTML=`<div class="emp"><div class="empi">👆</div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:6px">選擇消費情境</div>
+      <div style="font-size:13px">上方選好地區 + 情境，即可看最佳刷卡建議</div></div>`;
+    return;
+  }
+
+  const reg=REGIONS.find(r=>r.id===ST.region);
+  const scList=SC[ST.region]||[];
+  const scen=scList.find(s=>s.id===ST.scen);
+  if(!scen){area.innerHTML='';return;}
+
+  const isTW=ST.region==='tw';
+  const twRate=reg.r;
+  const amtTWD=ST.amt*twRate;
+  const owned=cards.filter(c=>c.owned);
+
+  if(!owned.length){
+    area.innerHTML=`<div class="emp"><div class="empi">💳</div>
+      <div style="font-size:15px;font-weight:700">尚未設定持有的卡片</div>
+      <div style="font-size:13px;margin-top:6px">到「我的卡」開啟持有的卡</div>
+      <button onclick="go('cards')" style="margin-top:12px;padding:10px 24px;background:var(--accent);
+        color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600">去設定</button>
+      </div>`;
+    return;
+  }
+
+  // Rank
+  const ranked=owned.map(card=>{
+    const r=calcCard(card,scen.rk,isTW,amtTWD);
+    return{card,...r};
+  }).sort((a,b)=>(b.isRevolut?0:b.net)-(a.isRevolut?0:a.net));
+
+  const w=ranked[0];
+  const html=[];
+
+  // Winner card
+  const wNet=w.isRevolut?0:w.net;
+  const wNetStr=w.isRevolut?'0':wNet.toFixed(1);
+  const cbStr=w.isRevolut?`${reg.cur} 直接消費`:`NT$${Math.round(w.cashback)}`;
+  const rk=w.rateKey||'';
+  const pmBase=w.isRevolut?'🔵 Revolut App'
+    :rk==='overseas_online'||rk==='tw_digital'?'🖥️ 線上刷卡'
+    :rk==='tw_shopee'?'🛍️ 蝦皮購物'
+    :rk==='overseas_subscription'?'📱 訂閱付款'
+    :rk==='overseas_apple'?'🍎 Apple 付款'
+    :(rk==='overseas_flight'||rk==='overseas_flight_eva'||rk==='overseas_flight_budget'||rk==='tw_flight'||rk==='tw_flight_eva')?'✈️ 線上訂票'
+    :rk==='overseas_hotel'?'🏨 線上訂房'
+    :rk==='overseas_train'?'🚄 線上訂票'
+    :(rk==='overseas_insurance'||rk==='tw_insurance')?'💼 保費繳費'
+    :rk==='tw_cvs'?'🏪 超商消費'
+    :rk==='tw_costco'?'🏬 Costco 消費'
+    :rk==='tw_dining'?'🍽️ 餐廳消費'
+    :'💳 實體刷卡';
+  const pms=[pmBase];
+  if(w.note&&w.note.includes('Pay'))pms.push('📱 行動支付');
+
+  html.push(`<div class="wc" style="background:rgba(22,163,74,0.85)">
+    <div class="wdec"></div>
+    <div class="wchip">🏆 最佳選擇</div>
+    <div class="wn">${w.card.name}</div>
+    <div class="ws">${w.card.bank} · ${w.card.rewardLabel}</div>
+    <div class="wr">
+      <div>
+        <div style="display:flex;align-items:flex-end;gap:2px">
+          <span class="wbig">${wNetStr}</span><span class="wpct">%</span>
+        </div>
+        <div class="wbd">
+          ${!w.isRevolut&&!isTW?`毛 ${w.gross}% − 手續費 ${w.card.fee}%`:w.isRevolut?'無回饋 · 無手續費 · 無匯差':`淨回饋 ${wNet.toFixed(1)}%（無海外手續費）`}
+          ${w.capped?'<br>⚠️ 月回饋上限已達':''}
+        </div>
+      </div>
+      <div class="wcb"><div class="wcbn">${cbStr}</div><div class="wcbl">預估回饋</div></div>
+    </div>
+    <div class="wpms">${pms.map(p=>`<span class="pmc">${p}</span>`).join('')}
+      ${w.isRestricted?`<span class="pmc">⚠️ ${w.rewardLabel}</span>`:''}
+    </div>
+  </div>`);
+
+  // Banners
+  if(w.capped&&w.capAmt&&!w.trackerCapped){
+    const fallback=ranked.find(r=>r!==w&&!r.isRevolut&&r.net>0.1);
+    const cap=w.capAmt;
+    // Spending threshold before cap hit
+    const thresh=w.card.capBonusOnly
+      ?(w.card.capBonusPct>0?Math.round(cap/w.card.capBonusPct*100/twRate):0)
+      :(w.gross>0?Math.round(cap/w.gross*100/twRate):0);
+    html.push(`<div class="bn bn-w"><span class="bni">⚠️</span>
+      <span><strong>${w.card.name}</strong> 月回饋上限 NT$${cap}（約 ${reg.cur}${thresh} 消費後達頂）。
+      ${fallback?`達上限後改用 <strong>${fallback.card.name}</strong>（淨回饋 ${fallback.net.toFixed(1)}%）`:'達上限後建議改用 Revolut'}。
+      </span></div>`);
+  }
+  if(w.trackerCapped){
+    const alt=ranked.find(r=>r!==w&&!r.isRevolut&&r.net>0.1);
+    html.push(`<div class="bn bn-r"><span class="bni">⛔</span>
+      <span><strong>${w.card.name}</strong> 本月加碼上限已達頂（NT$${w.card.capAmt}），此情境淨回饋降為 ${w.net.toFixed(1)}%。${
+        alt?`建議改用 <strong>${alt.card.name}</strong>（淨 ${alt.net.toFixed(1)}%）`:'建議改用 Revolut 直付'}。</span>
+    </div>`);
+  }
+  if(w.reg&&w.regNote){
+    html.push(`<div class="bn bn-w"><span class="bni">📋</span><span>${w.regNote}</span></div>`);
+  }
+  if(w.note&&!w.isRevolut){
+    html.push(`<div class="bn bn-b"><span class="bni">ℹ️</span><span>${w.note}</span></div>`);
+  }
+  if(w.isRevolut){
+    html.push(`<div class="bn bn-b"><span class="bni">🔵</span>
+      <span>所有台灣信用卡在此情境淨回饋 ≤ 0%。<strong>Revolut 直接消費英鎊</strong>，無手續費、無回饋，但比台灣卡扣掉手續費後更划算。</span></div>`);
+  }
+  if(w.isRestricted){
+    html.push(`<div class="bn bn-w"><span class="bni">⚠️</span>
+      <span>此卡回饋為「${w.rewardLabel}」，<strong>並非現金</strong>。請確認你有足夠的使用場合再評估是否划算。</span></div>`);
+  }
+  if((scen.rk==='overseas_online'||scen.rk==='overseas_subscription'||scen.rk==='overseas_apple')
+    &&owned.find(c=>c.id==='eco')){
+    html.push(`<div class="bn bn-w"><span class="bni">🌐</span>
+      <span>此為<strong>線上/非實體消費</strong>，eco 的 5% 不適用（僅限實體刷卡）。eco 此情境僅 1%，扣手續費後為 -0.5%。</span></div>`);
+  }
+
+  // All cards comparison
+  html.push(`<div class="lbl" style="margin-top:10px">所有卡片比較（${ranked.length} 張）</div>`);
+  html.push('<div class="cl">');
+  ranked.forEach((r,i)=>{
+    const net=r.isRevolut?0:r.net;
+    const nc=r.isRevolut?'z':net>0.1?'pos':'neg';
+    const cashStr=r.isRevolut?`${reg.cur} 直付`:`NT$${Math.round(r.cashback)}`;
+    const dimmed=!r.isRevolut&&net<-0.05;
+    const bdgs=[];
+    if(r.capped)bdgs.push(`<span class="bd bd-c">⚠️ 月上限 NT$${r.capAmt}</span>`);
+    if(r.reg)bdgs.push(`<span class="bd bd-r">📋 需登記</span>`);
+    if(!r.isRevolut&&net<0)bdgs.push(`<span class="bd bd-x">❌ 手續費>回饋</span>`);
+    if(r.isRevolut)bdgs.push(`<span class="bd bd-ok">✓ 零匯差</span>`);
+    if(r.isRestricted)bdgs.push(`<span class="bd bd-pt">⚠️ ${r.rewardLabel}</span>`);
+
+    html.push(`<div class="ci${dimmed?' dim':''}">
+      <div class="crk${i===0?' g':''}">${i+1}</div>
+      <div class="cst" style="background:${r.card.color}"></div>
+      <div class="cif">
+        <div class="cin">${r.card.name}</div>
+        <div class="cib">${r.card.bank}</div>
+        ${bdgs.length?`<div class="cibdgs">${bdgs.join('')}</div>`:''}
+        ${r.note?`<div class="cino">${r.note}</div>`:''}
+      </div>
+      <div class="crt">
+        <div class="crn ${nc}">${r.isRevolut?'0':net.toFixed(1)}<span class="crpct">%</span></div>
+        ${!r.isRevolut&&!isTW?`<div class="crgr">毛 ${r.gross}%</div><div class="crfe">-手續費 ${r.card.fee}%</div>`:''}
+        <div class="crca">${cashStr}</div>
+      </div>
+    </div>`);
+  });
+  html.push('</div>');
+
+  // Revolut insight
+  if(!isTW){
+    const good=ranked.filter(r=>!r.isRevolut&&r.net>0.1);
+    const bad=ranked.filter(r=>!r.isRevolut&&r.net<-0.05);
+    html.push(`<div class="rvbox">
+      <div class="rvt">🔵 Revolut 使用時機</div>
+      <div class="rvb">
+        ${good.length?`✅ <strong>${good.map(r=>r.card.name).join('、')}</strong> 淨回饋為正，比 Revolut 更划算。`
+          :'⚠️ 所有台灣信用卡淨回饋 ≤ 0%，此情境用 Revolut 更省。'}
+        ${bad.length?`<br>❌ <strong>${bad.map(r=>r.card.name).join('、')}</strong> 手續費>回饋，請用 Revolut 或上方推薦的卡。`:''}
+      </div>
+    </div>`);
+  }
+
+  area.innerHTML=html.join('');
+}
+
+/* ============================
+   CARD PICKER (從資料庫新增)
+   ============================ */
+let pkFilter='';
+function openPicker(){
+  pkFilter='';
+  document.getElementById('pk-search').value='';
+  renderPickerList();
+  document.getElementById('pick-modal').classList.remove('hide');
+}
+function renderPickerList(){
+  const q=pkFilter.toLowerCase();
+  const list=CARD_DB.filter(c=>!q||(c.bank+c.name).toLowerCase().includes(q));
+  const banks={};
+  list.forEach(c=>{if(!banks[c.bank])banks[c.bank]=[];banks[c.bank].push(c);});
+  let html='';
+  Object.entries(banks).forEach(([bank,bCards])=>{
+    html+=`<div class="pk-bank">${bank}</div>`;
+    bCards.forEach(c=>{
+      const owned=cards.find(x=>x.id===c.id);
+      html+=`<div class="pk-item" onclick="selectFromDB('${c.id}')">
+        <div class="pk-dot" style="background:${c.color}"></div>
+        <div class="pk-info">
+          <div class="pk-name">${c.name}</div>
+          <div class="pk-sub">${c.rewardLabel} · 海外手續費 ${c.fee}%</div>
+        </div>
+        ${owned?'<span style="font-size:11px;background:#ecfdf5;color:#059669;padding:3px 8px;border-radius:10px;font-weight:700">已新增</span>'
+          :'<span style="font-size:18px;color:var(--sub)">+</span>'}
+      </div>`;
+    });
+  });
+  if(!html)html='<div style="text-align:center;padding:24px;color:var(--sub);font-size:14px">找不到符合的卡片</div>';
+  document.getElementById('pk-list').innerHTML=html;
+}
+function selectFromDB(id){
+  const tmpl=CARD_DB.find(c=>c.id===id);
+  if(!tmpl)return;
+  const existing=cards.find(c=>c.id===id);
+  if(existing){
+    if(confirm(`${tmpl.bank} ${tmpl.name} 已在清單中，要編輯它嗎？`)){
+      closeModal('pick-modal');
+      openCard(id);
+    }
+    return;
+  }
+  // 直接新增，不開表單
+  const newCard=JSON.parse(JSON.stringify(tmpl));
+  newCard.owned=true;
+  initTracker(newCard);autoResetCheck(newCard);
+  cards.push(newCard);
+  save();renderCards();render();renderSources();
+  renderPickerList(); // 更新已新增標記
+  showToast(`✅ 已新增：${tmpl.bank} ${tmpl.name}`);
+}
+function showToast(msg){
+  const t=document.createElement('div');
+  t.className='toast';t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.style.opacity='0',2000);
+  setTimeout(()=>t.remove(),2300);
+}
+function openSimpleAdd(){
+  document.getElementById('sa-bank').value='';
+  document.getElementById('sa-name').value='';
+  document.getElementById('simple-add-modal').classList.remove('hide');
+}
+function quickAdd(){
+  const bank=document.getElementById('sa-bank').value.trim();
+  const name=document.getElementById('sa-name').value.trim();
+  if(!bank||!name){alert('請填寫銀行和卡片名稱');return;}
+  cards.push({id:'c'+Date.now(),bank,name,color:COLORS[0],fee:1.5,
+    defaultRate:1.0,rewardType:'cash',rewardLabel:'現金回饋',
+    officialUrl:'',owned:true,capAmt:0,capKey:null,
+    capBonusOnly:false,capBonusPct:0,capBaseRate:1.0,overrides:{}});
+  save();renderCards();render();renderSources();
+  closeModal('simple-add-modal');
+  showToast(`✅ 已新增：${bank} ${name}`);
+}
+
+/* ============================
+   MY CARDS
+   ============================ */
+function renderCards(){
+  const sorted=[...cards.filter(c=>c.owned),...cards.filter(c=>!c.owned)];
+  let html='';
+  let shownDisabled=false;
+  sorted.forEach(c=>{
+    if(!c.owned&&!shownDisabled){
+      shownDisabled=true;
+      html+=`<div class="lbl" style="padding-left:0">未加入比較</div>`;
+    }
+    const hasTrk=c.owned&&c.capAmt>0&&c.tracker;
+    html+=`<div class="mci" style="flex-direction:column;align-items:stretch;padding:0${!c.owned?';opacity:.5':''}">
+      <div style="display:flex;align-items:center;gap:10px;padding:13px 14px">
+        <div class="mcs" style="background:${c.color}"></div>
+        <div class="mcif">
+          <div class="mcn">${c.name}</div>
+          <div class="mcb">${c.bank}</div>
+          <div class="mcm">${c.rewardLabel}${c.fee===0?' · 免海外手續費':` · 海外手續費 ${c.fee}%`}</div>
+        </div>
+        <button class="mce" onclick="openCard('${c.id}')">編輯</button>
+        <div class="tgl${c.owned?' on':''}" onclick="tog('${c.id}')"></div>
+      </div>
+      ${hasTrk?renderTrackerWidget(c):''}
+    </div>`;
+  });
+  document.getElementById('clist').innerHTML=html;
+}
+function tog(id){
+  const c=cards.find(x=>x.id===id);
+  if(c){c.owned=!c.owned;save();renderCards();render();}
+}
+
+/* ============================
+   CARD MODAL (Add/Edit)
+   ============================ */
+let selColor=COLORS[0];
+
+function openCard(id){
+  const card=id?cards.find(c=>c.id===id):null;
+  selColor=card?card.color:COLORS[0];
+  editROList=card?Object.entries(card.overrides||{}).map(([k,v])=>({k,...v})):[];
+  delete document.getElementById('f-id').dataset.templateId;
+
+  document.getElementById('cmod-title').textContent=card?'編輯卡片':'新增卡片';
+  document.getElementById('f-bank').value=card?.bank||'';
+  document.getElementById('f-name').value=card?.name||'';
+  document.getElementById('f-fee').value=card?.fee??1.5;
+  document.getElementById('f-def').value=card?.defaultRate??1.0;
+  document.getElementById('f-rtype').value=card?.rewardType||'cash';
+  document.getElementById('f-rlabel').value=card?.rewardLabel||'';
+  document.getElementById('f-url').value=card?.officialUrl||'';
+  document.getElementById('f-id').value=id||'';
+  document.getElementById('f-cap-amt').value=card?.capAmt||0;
+  document.getElementById('f-cap-bonus').value=card?.capBonusOnly?'yes':'no';
+  document.getElementById('f-cap-base').value=card?.capBaseRate||1.0;
+  document.getElementById('del-btn').style.display=id?'block':'none';
+
+  // Cap key select
+  const cks=document.getElementById('f-cap-key');
+  cks.innerHTML=`<option value="">（全部情境共用上限）</option>`+
+    RKEYS.map(r=>`<option value="${r.k}" ${card?.capKey===r.k?'selected':''}>${r.l}</option>`).join('');
+
+  renderColorPicker();
+  renderROList();
+  switchTab('info');
+  document.getElementById('card-modal').classList.remove('hide');
+}
+
+function renderColorPicker(){
+  document.getElementById('cpk').innerHTML=COLORS.map(c=>
+    `<div class="cd${c===selColor?' sel':''}" style="background:${c}" onclick="pickC('${c}',this)"></div>`
+  ).join('');
+}
+function pickC(c,el){
+  selColor=c;
+  document.querySelectorAll('.cd').forEach(d=>d.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function switchTab(t){
+  document.getElementById('tab-info').classList.toggle('on',t==='info');
+  document.getElementById('tab-rates').classList.toggle('on',t==='rates');
+  document.getElementById('tab-info-body').style.display=t==='info'?'block':'none';
+  document.getElementById('tab-rates-body').style.display=t==='rates'?'block':'none';
+}
+
+function renderROList(){
+  document.getElementById('ro-list').innerHTML=editROList.map((ro,i)=>
+    `<div class="ro-item">
+      <div class="ro-key">${rkLabel(ro.k)}</div>
+      <div class="ro-val">${ro.rate}%</div>
+      <button class="ro-edit" onclick="openRO(${i})">編輯</button>
+    </div>`
+  ).join('')||(editROList.length===0?'<div style="text-align:center;padding:16px;font-size:13px;color:var(--sub)">尚未設定情境回饋，將使用預設回饋率</div>':'');
+}
+
+function addRO(){
+  openRO(-1); // -1 = new
+}
+
+function openRO(idx){
+  editROSelIdx=idx;
+  const ro=idx>=0?editROList[idx]:null;
+  // Populate key select
+  const ks=document.getElementById('ro-key');
+  ks.innerHTML=RKEYS.map(r=>`<option value="${r.k}" ${ro?.k===r.k?'selected':''}>${r.l}</option>`).join('');
+  document.getElementById('ro-rate').value=ro?.rate||'';
+  document.getElementById('ro-note').value=ro?.note||'';
+  document.getElementById('ro-reg').value=ro?.reg?'yes':'no';
+  document.getElementById('ro-regnote').value=ro?.regNote||'';
+  document.getElementById('ro-regnote-wrap').style.display=ro?.reg?'block':'none';
+  document.getElementById('ro-del-btn').style.display=idx>=0?'block':'none';
+  document.getElementById('ro-reg').onchange=function(){
+    document.getElementById('ro-regnote-wrap').style.display=this.value==='yes'?'block':'none';
+  };
+  document.getElementById('ro-modal').classList.remove('hide');
+}
+
+function saveRO(){
+  const k=document.getElementById('ro-key').value;
+  const rate=parseFloat(document.getElementById('ro-rate').value)||0;
+  const note=document.getElementById('ro-note').value.trim()||null;
+  const reg=document.getElementById('ro-reg').value==='yes';
+  const regNote=reg?(document.getElementById('ro-regnote').value.trim()||null):null;
+  const obj={k,rate,note,reg,regNote};
+  if(editROSelIdx>=0)editROList[editROSelIdx]=obj;
+  else editROList.push(obj);
+  renderROList();
+  closeModal('ro-modal');
+}
+
+function delRO(){
+  if(editROSelIdx>=0)editROList.splice(editROSelIdx,1);
+  renderROList();
+  closeModal('ro-modal');
+}
+
+function saveCard(){
+  const bank=document.getElementById('f-bank').value.trim();
+  const name=document.getElementById('f-name').value.trim();
+  if(!bank||!name){alert('請填寫銀行和卡片名稱');return;}
+  const fee=parseFloat(document.getElementById('f-fee').value)||0;
+  const def=parseFloat(document.getElementById('f-def').value)||1.0;
+  const rtype=document.getElementById('f-rtype').value;
+  const rlabel=document.getElementById('f-rlabel').value.trim();
+  const url=document.getElementById('f-url').value.trim();
+  const capAmt=parseFloat(document.getElementById('f-cap-amt').value)||0;
+  const capKey=document.getElementById('f-cap-key').value||null;
+  const capBonusOnly=document.getElementById('f-cap-bonus').value==='yes';
+  const capBaseRate=parseFloat(document.getElementById('f-cap-base').value)||1.0;
+  const overrides={};
+  editROList.forEach(ro=>overrides[ro.k]={rate:ro.rate,note:ro.note,reg:ro.reg,regNote:ro.regNote});
+  const editId=document.getElementById('f-id').value;
+  if(editId){
+    const c=cards.find(x=>x.id===editId);
+    if(c){Object.assign(c,{bank,name,color:selColor,fee,defaultRate:def,rewardType:rtype,
+      rewardLabel:rlabel,officialUrl:url,capAmt,capKey,capBonusOnly,capBaseRate,overrides});initTracker(c);}
+  }else{
+    const tid=document.getElementById('f-id').dataset.templateId||'';
+    const tmplRef=tid?CARD_DB.find(c=>c.id===tid):null;
+    delete document.getElementById('f-id').dataset.templateId;
+    cards.push({id:tid||('c'+Date.now()),bank,name,color:selColor,fee,defaultRate:def,
+      rewardType:rtype,rewardLabel:rlabel,officialUrl:url,owned:true,
+      capAmt,capKey,capBonusOnly,capBaseRate,overrides,
+      capBonusPct:tmplRef?.capBonusPct??4,
+      isRevolut:tmplRef?.isRevolut||false});
+  }
+  save();renderCards();render();
+  closeModal('card-modal');
+}
+
+function delCard(){
+  if(!confirm('確定刪除這張卡？'))return;
+  const id=document.getElementById('f-id').value;
+  cards=cards.filter(c=>c.id!==id);
+  save();renderCards();render();
+  closeModal('card-modal');
+}
+
+/* ============================
+   SOURCES (Settings)
+   ============================ */
+let srcOpen=false;
+function toggleSrc(){
+  srcOpen=!srcOpen;
+  document.getElementById('src-body').style.display=srcOpen?'block':'none';
+  document.getElementById('src-icon').textContent=srcOpen?'－':'＋';
+}
+function renderSources(){
+  document.getElementById('src-list').innerHTML=cards.map(c=>{
+    const db=CARD_DB.find(x=>x.id===c.id);
+    const url=db?.officialUrl||c.officialUrl;
+    return `<div class="src-item">
+      <div class="src-dot" style="background:${c.color}"></div>
+      <div class="src-info">
+        <div class="src-name">${c.bank} ${c.name}</div>
+        ${url?`<a href="${url}" target="_blank" class="src-url">${url}</a>`
+          :'<span style="font-size:11px;color:var(--sub)">未設定來源連結</span>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ============================
+   IMPORT / EXPORT / RESET
+   ============================ */
+function exp(){
+  const blob=new Blob([JSON.stringify(cards,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='cards.json';a.click();
+}
+function imp(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{const p=JSON.parse(ev.target.result);
+      if(Array.isArray(p)){cards=p;cards.forEach(c=>{initTracker(c);autoResetCheck(c);});save();renderCards();render();alert('匯入成功，共 '+p.length+' 張卡');}
+      else alert('格式錯誤');
+    }catch(err){alert('解析失敗：'+err.message);}
+  };
+  r.readAsText(f);e.target.value='';
+}
+function rst(){
+  if(!confirm('確定還原預設資料？'))return;
+  cards=JSON.parse(JSON.stringify(DC));
+  cards.forEach(c=>{initTracker(c);autoResetCheck(c);});
+  save();renderCards();render();alert('已還原');
+}
+
+/* ============================
+   MODAL UTILS
+   ============================ */
+function closeModal(id){document.getElementById(id).classList.add('hide');}
+function bgClick(e,id){if(e.target===e.currentTarget)closeModal(id);}
+
+/* ============================
+   COLOR UTILS
+   ============================ */
+function dk(hex,p){
+  hex=hex.replace('#','');
+  if(hex.length===3)hex=hex.split('').map(c=>c+c).join('');
+  const n=parseInt(hex,16),a=Math.round(2.55*p);
+  const r=Math.max(0,Math.min(255,(n>>16)-a));
+  const g=Math.max(0,Math.min(255,(n>>8&0xff)-a));
+  const b=Math.max(0,Math.min(255,(n&0xff)-a));
+  return'#'+(0x1000000+r*0x10000+g*0x100+b).toString(16).slice(1);
+}
+
+/* ============================
+   INIT
+   ============================ */
+// App icon (for iOS Add to Home Screen)
+(function(){
+  const c=document.createElement('canvas');
+  c.width=c.height=512;
+  const ctx=c.getContext('2d');
+  // Background
+  ctx.fillStyle='#0D0D0D';
+  if(ctx.roundRect){ctx.beginPath();ctx.roundRect(0,0,512,512,112);ctx.fill();}
+  else{ctx.fillRect(0,0,512,512);}
+  // Card body
+  const r=18,x=72,y=168,w=368,h=224;
+  ctx.fillStyle='#1A1A1A';
+  ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();
+  // Card stripe
+  ctx.fillStyle='#D4380D';
+  ctx.fillRect(x,y+60,w,38);
+  // Chip
+  ctx.fillStyle='#FFFFFF';
+  ctx.beginPath();ctx.roundRect(x+28,y+28,50,36,6);ctx.fill();
+  // Card number dots
+  ctx.fillStyle='rgba(255,255,255,0.45)';
+  [[x+28,y+135],[x+98,y+135],[x+168,y+135],[x+248,y+135]].forEach(([px,py])=>{
+    for(let i=0;i<4;i++){ctx.beginPath();ctx.arc(px+i*11,py,4,0,Math.PI*2);ctx.fill();}
+  });
+  // Bottom label
+  ctx.font='bold 52px -apple-system,sans-serif';
+  ctx.fillStyle='#FFFFFF';
+  ctx.textAlign='center';
+  ctx.fillText('刷卡神器',256,436);
+  const link=document.getElementById('app-icon');
+  if(link)link.href=c.toDataURL('image/png');
+})();
+
+loadCards();
+document.getElementById('acur').textContent=(REGIONS.find(r=>r.id===ST.region)||REGIONS[0]).cur;
+// First-use hint
+if(!localStorage.getItem('shenqi4_seen')){document.getElementById('first-hint').style.display='block';}
+renderRegions();
+renderScenarios();
+// Restore last scenario selection
+if(ST.scen){
+  const sel=document.getElementById('ssel');
+  if(sel){sel.value=ST.scen;const scen=(SC[ST.region]||[]).find(s=>s.id===ST.scen);
+    const ex=document.getElementById('scen-ex');
+    if(scen&&scen.ex){ex.textContent=scen.ex;ex.style.display='block';}}
+}
+// Restore last amount
+const ainp=document.getElementById('ainp');
+if(ainp&&ST.amt)ainp.value=ST.amt;
+renderQuickAmts();
+updateTWD();
+render();
+</script>
+</body>
+</html>
