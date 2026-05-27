@@ -514,7 +514,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","
   <div class="mt">手動新增卡片</div>
   <div style="font-size:13px;color:var(--sub);margin-bottom:14px;line-height:1.6">
     輸入銀行名稱與卡片名稱，系統會以預設資料建立。<br>
-    新增後可點「編輯」更新回饋率。
+    新增後可點「編輯」更新回饋率。<br>
+    <span style="color:var(--accent)">📬 你的請求會自動回報，未來版本將正式收錄此卡。</span>
   </div>
   <div class="fg">
     <label class="fl">銀行名稱</label>
@@ -1610,17 +1611,19 @@ function openSimpleAdd(){
   document.getElementById('sa-name').value='';
   document.getElementById('simple-add-modal').classList.remove('hide');
 }
+const CARD_REQUEST_URL='https://script.google.com/macros/s/AKfycbx7ai4Cb8kHMl2l-MPNyu1wK7_jtE34y2WIEHYz6_twsKnVGGt9pA_JqrEp2rUtu8Py/exec';
 function quickAdd(){
   const bank=document.getElementById('sa-bank').value.trim();
   const name=document.getElementById('sa-name').value.trim();
   if(!bank||!name){alert('請填寫銀行和卡片名稱');return;}
+  fetch(CARD_REQUEST_URL,{method:'POST',body:JSON.stringify({bank,cardName:name,note:'用戶手動新增請求'}),mode:'no-cors'}).catch(()=>{});
   cards.push({id:'c'+Date.now(),bank,name,color:COLORS[0],fee:1.5,
     defaultRate:1.0,rewardType:'cash',rewardLabel:'現金回饋',
     officialUrl:'',owned:true,capAmt:0,capKey:null,
     capBonusOnly:false,capBonusPct:0,capBaseRate:1.0,overrides:{}});
   save();renderCards();render();renderSources();
   closeModal('simple-add-modal');
-  showToast(`✅ 已新增：${bank} ${name}`);
+  showToast(`✅ 已新增：${bank} ${name}（已回報系統）`);
 }
 
 /* ============================

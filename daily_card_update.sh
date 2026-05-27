@@ -3,8 +3,8 @@
 # 由 Claude Code 設定，每天 00:00 執行
 
 CLAUDE="/Applications/cmux.app/Contents/Resources/bin/claude"
-HTML="/Users/markhsieh/Downloads/Mark/Mark agent_Claude co/刷卡神器.html"
-LOG="/Users/markhsieh/Downloads/Mark/Mark agent_Claude co/daily_update.log"
+HTML="/Users/markhsieh/shuaka-shenqi/index.html"
+LOG="/Users/markhsieh/shuaka-shenqi/daily_update.log"
 TODAY=$(date '+%Y-%m-%d %H:%M')
 
 echo "" >> "$LOG"
@@ -38,3 +38,34 @@ echo "========================================" >> "$LOG"
   >> "$LOG" 2>&1
 
 echo "[$TODAY] 完成" >> "$LOG"
+
+# ── 步驟 B：讀取 Google Sheet 的用戶新增卡片請求 ──
+SHEET_CSV="https://docs.google.com/spreadsheets/d/111kABplayPNCKXQ2yJNNVA8oppjd93HNcgTq8-TsNBo/export?format=csv"
+PENDING=$(curl -sL "$SHEET_CSV" 2>/dev/null | awk -F',' 'NR>1 && $5~/pending/ {print NR": 銀行="$2" 卡名="$3}')
+
+if [ -n "$PENDING" ]; then
+  echo "" >> "$LOG"
+  echo "[用戶請求] 發現待處理的卡片請求：" >> "$LOG"
+  echo "$PENDING" >> "$LOG"
+
+  "$CLAUDE" -p "你是信用卡資料研究員兼工程師。今天日期：$(date '+%Y-%m-%d')。
+
+以下是用戶回報「刷卡神器」尚未收錄的信用卡，請依序處理：
+
+$PENDING
+
+對每張卡：
+1. 上網搜尋該卡的官方回饋率、海外手續費、是否有登錄條件
+2. 若找到足夠資訊，將新卡資料加入 $HTML 的 CARD_DB 陣列（格式比照現有卡片）
+3. 若找不到足夠資訊，標記為「需人工確認」
+
+輸出報告：
+- 每張卡的處理結果（✅ 已新增 / ⚠️ 需人工確認：原因）
+- 最後一行：CARD_RESULT: 已新增 N 張 / 無可處理請求" \
+    --allowedTools "Read,Edit,Write,Bash,WebSearch,WebFetch" \
+    >> "$LOG" 2>&1
+
+  echo "[用戶請求] 處理完成" >> "$LOG"
+else
+  echo "[用戶請求] 無新增卡片請求" >> "$LOG"
+fi
