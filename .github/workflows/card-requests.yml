@@ -1,0 +1,42 @@
+name: 卡片請求即時處理
+
+on:
+  schedule:
+    # 每 30 分鐘檢查一次 Google Sheet 是否有 pending 請求
+    - cron: '*/30 * * * *'
+  workflow_dispatch:        # 允許手動觸發
+
+permissions:
+  contents: write           # 讓 Action 能 commit + push
+
+jobs:
+  process-requests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 安裝 Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 安裝 Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: 處理 pending 卡片請求
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: bash ci/process_requests.sh
+
+      - name: Commit & push 變更
+        run: |
+          git config user.name "shuaka-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "無變更"
+          else
+            git commit -m "處理卡片請求 $(date '+%Y-%m-%d %H:%M')"
+            git push
+          fi
