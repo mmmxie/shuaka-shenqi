@@ -259,25 +259,80 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","
 
 <!-- HOME -->
 <div id="scr-home" class="scr on">
+  <style>
+    .srch-wrap{position:relative;margin:14px 16px 4px;}
+    .srch-in{width:100%;box-sizing:border-box;padding:15px 16px 15px 46px;font-size:16px;
+      border:2px solid #e5e7eb;border-radius:14px;outline:none;background:#fff;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;background-position:15px center;}
+    .srch-in:focus{border-color:var(--accent,#D4380D);}
+    .srch-sug{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);background:#fff;
+      border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.13);z-index:50;
+      overflow-y:auto;max-height:320px;}
+    .srch-sug.on{display:block;}
+    .sug{display:flex;align-items:center;gap:9px;padding:11px 14px;cursor:pointer;border-bottom:1px solid #f3f4f6;}
+    .sug:last-child{border-bottom:none;}
+    .sug:active,.sug:hover{background:#f8fafc;}
+    .sug-f{font-size:17px;}
+    .sug-l{font-weight:600;font-size:14px;color:#111;white-space:nowrap;}
+    .sug-ex{font-size:11px;color:#9ca3af;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+    .sug-empty{padding:14px;font-size:13px;color:#6b7280;line-height:1.6;}
+    .schip{display:inline-block;margin:2px 4px 0 0;padding:5px 11px;background:#f1f5f9;border-radius:20px;
+      font-size:12px;color:#475569;cursor:pointer;border:none;}
+    .schip:active{background:#e2e8f0;}
+    .rsum-cx{margin:16px 16px 0;font-size:14px;font-weight:700;color:#374151;}
+    .rsum-f{font-size:16px;}
+    .wc2{margin:10px 16px 0;background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:16px;
+      box-shadow:0 4px 16px rgba(0,0,0,.06);}
+    .wc2-top{display:flex;align-items:center;gap:12px;}
+    .wc2-stripe{width:6px;align-self:stretch;border-radius:4px;min-height:48px;}
+    .wc2-chip{display:inline-block;font-size:11px;font-weight:700;color:#16a34a;background:#dcfce7;
+      padding:2px 8px;border-radius:6px;margin-bottom:4px;}
+    .wc2-name{font-size:18px;font-weight:800;color:#111;line-height:1.2;}
+    .wc2-bank{font-size:12px;color:#6b7280;margin-top:1px;}
+    .wc2-rate{text-align:right;white-space:nowrap;}
+    .wc2-big{font-size:33px;font-weight:800;color:#16a34a;line-height:1;}
+    .wc2-pct{font-size:16px;font-weight:700;color:#16a34a;}
+    .wc2-rl{font-size:10px;color:#9ca3af;margin-top:3px;}
+    .wc2-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+    .wc2-cell{background:#f9fafb;border-radius:10px;padding:10px 12px;}
+    .wc2-k{font-size:11px;color:#9ca3af;margin-bottom:3px;}
+    .wc2-v{font-size:15px;font-weight:800;color:#111;}
+    .wc2-note{margin-top:10px;font-size:12px;color:#4b5563;line-height:1.6;background:#f3f4f6;
+      border-radius:8px;padding:8px 10px;}
+    .rlist{margin:8px 16px 0;display:flex;flex-direction:column;gap:8px;}
+    .rrow{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #eef0f3;
+      border-radius:12px;padding:10px 12px;}
+    .rrow.top{border-color:#bbf7d0;background:#f0fdf4;}
+    .rrk{width:22px;text-align:center;font-weight:800;color:#9ca3af;font-size:13px;}
+    .rrow.top .rrk{color:#16a34a;}
+    .rst2{width:5px;align-self:stretch;border-radius:3px;min-height:36px;}
+    .rinfo{flex:1;min-width:0;}
+    .rname{font-weight:700;font-size:14px;color:#111;}
+    .rbank{font-size:11px;color:#9ca3af;}
+    .rmeta{font-size:11px;color:#6b7280;margin-top:2px;}
+    .rrate{font-weight:800;font-size:18px;white-space:nowrap;}
+    .fn2{text-align:center;font-size:11px;color:#9ca3af;margin:16px;line-height:1.6;}
+  </style>
   <div id="first-hint" style="display:none;margin:10px 16px 0;background:#eff6ff;border-left:4px solid var(--blue);
     border-radius:10px;padding:10px 13px;font-size:12px;color:#1e40af;line-height:1.6">
-    💡 已內建常用台灣信用卡，選地區 + 情境即可比較回饋。到「我的卡」可開啟 / 關閉個別卡片。
+    💡 直接打你要消費的場景（商家、平台、情境），系統自動找出回饋最高的卡。例：Costco、蝦皮、Netflix、加油、日本藥妝。
     <button onclick="document.getElementById('first-hint').style.display='none';localStorage.setItem('shenqi4_seen','1')"
       style="float:right;background:none;border:none;font-size:14px;cursor:pointer;color:#1e40af;padding:0;line-height:1">✕</button>
   </div>
-  <div class="lbl">消費地區</div>
-  <div class="rg" id="rgrid"></div>
-  <div class="lbl">消費情境</div>
-  <div class="sw"><select class="ss" id="ssel" onchange="onSc()">
-    <option value="">— 選擇消費情境 —</option>
-  </select></div>
-  <div class="scen-desc" id="scen-ex"></div>
-  <div class="ar">
-    <span class="ac" id="acur">£</span>
-    <input type="number" class="ai" id="ainp" value="100" min="1" oninput="ST.amt=parseFloat(this.value)||100;saveST();render()">
-    <span class="amt-hint" id="atwd"></span>
+  <div class="srch-wrap">
+    <input type="text" id="srch" class="srch-in" autocomplete="off" placeholder="想刷什麼？例：Costco、蝦皮、Netflix、日本超市…"
+      oninput="doSearch(this.value)" onfocus="doSearch(this.value)">
+    <div id="srch-sug" class="srch-sug"></div>
   </div>
-  <div class="qbs" id="qbs"></div>
+  <div style="margin:0 16px;">
+    <button class="schip" onclick="quickSearch('Costco')">🏬 Costco</button>
+    <button class="schip" onclick="quickSearch('蝦皮')">🛍️ 蝦皮</button>
+    <button class="schip" onclick="quickSearch('訂閱')">📺 串流訂閱</button>
+    <button class="schip" onclick="quickSearch('便利商店')">🏪 超商</button>
+    <button class="schip" onclick="quickSearch('加油')">⛽ 加油</button>
+    <button class="schip" onclick="quickSearch('日本')">🇯🇵 日本</button>
+  </div>
   <div id="res"></div>
   <div class="fn">回饋率以各銀行官網最新公告為準 · 2026/05</div>
 </div>
@@ -1372,6 +1427,7 @@ function calcCard(card,rk,isTW,amtTWD){
    RENDER RESULTS
    ============================ */
 function render(){
+  return renderSearchResult();
   const area=document.getElementById('res');
   ST.amt=Math.max(1,parseFloat(document.getElementById('ainp').value)||100);
   updateTWD();
@@ -1542,6 +1598,140 @@ function render(){
     </div>`);
   }
 
+  area.innerHTML=html.join('');
+}
+
+/* ============================
+   SEARCH (single search bar)
+   ============================ */
+let SIDX=[];
+function sEsc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function buildSearchIndex(){
+  SIDX=[];
+  Object.keys(SC).forEach(rid=>{
+    const reg=REGIONS.find(r=>r.id===rid); if(!reg)return;
+    (SC[rid]||[]).forEach(s=>{
+      SIDX.push({rid,reg,scen:s,label:s.l,ex:s.ex||'',
+        hay:(reg.l+' '+s.l+' '+(s.ex||'')).toLowerCase()});
+    });
+  });
+}
+function parseExpiry(note){
+  if(!note)return null;
+  let m=note.match(/(?:至|到|止|～|~)\s*(20\d{2}\/\d{1,2}(?:\/\d{1,2})?)/);
+  if(m)return m[1];
+  m=note.match(/(20\d{2}\/\d{1,2}(?:\/\d{1,2})?)\s*(?:前|止|截止|到期)/);
+  if(m)return m[1];
+  return null;
+}
+function quickSearch(q){
+  const si=document.getElementById('srch'); if(si)si.value=q;
+  doSearch(q);
+}
+function doSearch(q){
+  try{localStorage.setItem('shenqi4_q',q);}catch(e){}
+  const box=document.getElementById('srch-sug');
+  const query=(q||'').trim().toLowerCase();
+  if(!query){box.innerHTML='';box.classList.remove('on');return;}
+  const toks=query.split(/\s+/).filter(Boolean);
+  const scored=SIDX.map(e=>{
+    let sc=0;
+    const ll=e.label.toLowerCase();
+    toks.forEach(t=>{
+      if(ll.includes(t))sc+=5;
+      else if(e.hay.includes(t))sc+=2;
+    });
+    if(e.hay.includes(query))sc+=3;
+    return{e,sc};
+  }).filter(x=>x.sc>0).sort((a,b)=>b.sc-a.sc).slice(0,8);
+  if(!scored.length){
+    box.innerHTML=`<div class="sug-empty">找不到「${sEsc(q)}」相關情境。<br>試試：Costco、蝦皮、Netflix、加油、日本超市、訂房、保費…</div>`;
+    box.classList.add('on');return;
+  }
+  box.innerHTML=scored.map(x=>{
+    const e=x.e;
+    return `<div class="sug" onclick="pickSug('${e.rid}','${e.scen.id}')">
+      <span class="sug-f">${e.reg.f}</span>
+      <span class="sug-l">${e.label}</span>
+      <span class="sug-ex">${sEsc((e.ex||'').slice(0,40))}</span>
+    </div>`;
+  }).join('');
+  box.classList.add('on');
+}
+function pickSug(rid,sid){
+  ST.region=rid; ST.scen=sid;
+  const scen=(SC[rid]||[]).find(s=>s.id===sid);
+  const si=document.getElementById('srch'); if(si&&scen)si.value=scen.l.replace(/^\S+\s*/,'');
+  document.getElementById('srch-sug').classList.remove('on');
+  saveST();
+  renderSearchResult();
+  setTimeout(()=>{const r=document.getElementById('res');if(r)r.scrollIntoView({behavior:'smooth',block:'start'});},60);
+}
+function renderEmpty(){
+  const area=document.getElementById('res'); if(!area)return;
+  area.innerHTML=`<div class="emp"><div class="empi">🔍</div>
+    <div style="font-size:15px;font-weight:700;margin-bottom:6px">輸入消費場景開始比較</div>
+    <div style="font-size:13px;line-height:1.7">打商家或情境，系統自動找出<strong>回饋最高的卡</strong>、<br>回饋上限與到期日。例：Costco、蝦皮、Netflix、加油…</div></div>`;
+}
+function renderSearchResult(){
+  const area=document.getElementById('res'); if(!area)return;
+  if(!ST.scen){renderEmpty();return;}
+  const reg=REGIONS.find(r=>r.id===ST.region);
+  const scen=(SC[ST.region]||[]).find(s=>s.id===ST.scen);
+  if(!reg||!scen){renderEmpty();return;}
+  const isTW=ST.region==='tw';
+  const ranked=cards.map(card=>{
+    const r=calcCard({...card,tracker:null},scen.rk,isTW,1000);
+    return{card,...r};
+  }).filter(r=>!r.isRevolut).sort((a,b)=>b.net-a.net);
+  if(!ranked.length){renderEmpty();return;}
+  const w=ranked[0];
+  const wCapApplies=w.capAmt>0&&(!w.card.capKey||w.card.capKey===scen.rk);
+  const capStr=wCapApplies?`NT$${w.capAmt.toLocaleString()} / 月`:'此情境無上限';
+  const exp=parseExpiry(w.note)||parseExpiry(w.regNote);
+  const expStr=exp?exp:'<span style="color:#9ca3af">未標示期限</span>';
+  const html=[];
+  html.push(`<div class="rsum-cx"><span class="rsum-f">${reg.f}</span> ${scen.l}</div>`);
+  html.push(`<div class="wc2">
+    <div class="wc2-top">
+      <div class="wc2-stripe" style="background:${w.card.color}"></div>
+      <div style="flex:1;min-width:0">
+        <div class="wc2-chip">🏆 回饋最高</div>
+        <div class="wc2-name">${w.card.name}</div>
+        <div class="wc2-bank">${w.card.bank} · ${w.card.rewardLabel}</div>
+      </div>
+      <div class="wc2-rate">
+        <div><span class="wc2-big">${w.net.toFixed(1)}</span><span class="wc2-pct">%</span></div>
+        <div class="wc2-rl">${isTW?'淨回饋':'淨回饋（已扣手續費）'}</div>
+      </div>
+    </div>
+    <div class="wc2-grid">
+      <div class="wc2-cell"><div class="wc2-k">回饋上限</div><div class="wc2-v">${capStr}</div></div>
+      <div class="wc2-cell"><div class="wc2-k">回饋到期日</div><div class="wc2-v">${expStr}</div></div>
+    </div>
+    ${w.note?`<div class="wc2-note">ℹ️ ${w.note}</div>`:''}
+    ${w.reg&&w.regNote?`<div class="wc2-note">📋 需登錄：${w.regNote}</div>`:''}
+    ${w.isRestricted?`<div class="wc2-note">⚠️ 回饋形式為「${w.rewardLabel}」，並非現金，請評估使用場合。</div>`:''}
+  </div>`);
+  html.push(`<div class="lbl" style="margin:16px 16px 0">完整比較（${ranked.length} 張卡）</div>`);
+  html.push('<div class="rlist">');
+  ranked.forEach((r,i)=>{
+    const capA=r.capAmt>0&&(!r.card.capKey||r.card.capKey===scen.rk);
+    const e2=parseExpiry(r.note)||parseExpiry(r.regNote);
+    const nc=r.net>0.1?'#16a34a':(r.net<-0.05?'#dc2626':'#6b7280');
+    html.push(`<div class="rrow${i===0?' top':''}">
+      <div class="rrk">${i+1}</div>
+      <div class="rst2" style="background:${r.card.color}"></div>
+      <div class="rinfo">
+        <div class="rname">${r.card.name}</div>
+        <div class="rbank">${r.card.bank}</div>
+        <div class="rmeta">${capA?`上限 NT$${r.capAmt.toLocaleString()}/月`:'無上限'}${e2?` · 至 ${e2}`:''}${r.reg?' · 需登錄':''}</div>
+      </div>
+      <div class="rrate" style="color:${nc}">${r.net.toFixed(1)}<span style="font-size:12px">%</span></div>
+    </div>`);
+  });
+  html.push('</div>');
+  html.push(`<div class="fn2">跨全部 ${ranked.length} 張卡比較 · 回饋率以各銀行官網最新公告為準<br>每日自動核查更新</div>`);
   area.innerHTML=html.join('');
 }
 
@@ -1913,24 +2103,20 @@ function dk(hex,p){
 })();
 
 loadCards();
-document.getElementById('acur').textContent=(REGIONS.find(r=>r.id===ST.region)||REGIONS[0]).cur;
 // First-use hint
 if(!localStorage.getItem('shenqi4_seen')){document.getElementById('first-hint').style.display='block';}
-renderRegions();
-renderScenarios();
-// Restore last scenario selection
-if(ST.scen){
-  const sel=document.getElementById('ssel');
-  if(sel){sel.value=ST.scen;const scen=(SC[ST.region]||[]).find(s=>s.id===ST.scen);
-    const ex=document.getElementById('scen-ex');
-    if(scen&&scen.ex){ex.textContent=scen.ex;ex.style.display='block';}}
-}
-// Restore last amount
-const ainp=document.getElementById('ainp');
-if(ainp&&ST.amt)ainp.value=ST.amt;
-renderQuickAmts();
-updateTWD();
-render();
+buildSearchIndex();
+// 還原上次查詢與結果
+(function(){
+  const lastQ=localStorage.getItem('shenqi4_q')||'';
+  const si=document.getElementById('srch'); if(si&&lastQ)si.value=lastQ;
+  if(ST.scen&&(SC[ST.region]||[]).find(s=>s.id===ST.scen))renderSearchResult();
+  else renderEmpty();
+})();
+// 點空白處收起建議清單
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.srch-wrap')){const b=document.getElementById('srch-sug');if(b)b.classList.remove('on');}
+});
 </script>
 </body>
 </html>
