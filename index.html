@@ -1624,6 +1624,14 @@ function parseExpiry(note){
   if(m)return m[1];
   return null;
 }
+function parseCap(note){
+  if(!note)return null;
+  let m=note.match(/(?:回饋上限|每期回饋上限|每月回饋上限|加碼上限|上限)[^0-9NT$點元]*(?:NT\$?|＄)\s*([0-9][0-9,]*)/);
+  if(m)return 'NT$'+m[1]+' / 期';
+  m=note.match(/(?:回饋上限|加碼上限|上限)[^0-9]*([0-9][0-9,]*)\s*點/);
+  if(m)return m[1]+' 點 / 期';
+  return null;
+}
 function quickSearch(q){
   const si=document.getElementById('srch'); if(si)si.value=q;
   doSearch(q);
@@ -1680,21 +1688,22 @@ function renderSearchResult(){
   const scen=(SC[ST.region]||[]).find(s=>s.id===ST.scen);
   if(!reg||!scen){renderEmpty();return;}
   const isTW=ST.region==='tw';
-  const ranked=cards.map(card=>{
+  // 跨「完整資料庫」CARD_DB（28 張）比對，且永遠讀檔案最新資料（不受 localStorage 舊快取影響）
+  const ranked=CARD_DB.map(card=>{
     const r=calcCard({...card,tracker:null},scen.rk,isTW,1000);
     return{card,...r};
   }).filter(r=>!r.isRevolut).sort((a,b)=>b.net-a.net);
   if(!ranked.length){renderEmpty();return;}
   const w=ranked[0];
   const wCapApplies=w.capAmt>0&&(!w.card.capKey||w.card.capKey===scen.rk);
-  const capStr=wCapApplies?`NT$${w.capAmt.toLocaleString()} / 月`:'此情境無上限';
+  const capStr=wCapApplies?`NT$${w.capAmt.toLocaleString()} / 月`:(parseCap(w.note)||'此情境無上限');
   const exp=parseExpiry(w.note)||parseExpiry(w.regNote);
   const expStr=exp?exp:'<span style="color:#9ca3af">未標示期限</span>';
   const html=[];
   html.push(`<div class="rsum-cx"><span class="rsum-f">${reg.f}</span> ${scen.l}</div>`);
   html.push(`<div class="wc2">
     <div class="wc2-top">
-      <div class="wc2-stripe" style="background:${w.card.color}"></div>
+      <div class="wc2-stripe" style="background:${w.card.color||'#64748b'}"></div>
       <div style="flex:1;min-width:0">
         <div class="wc2-chip">🏆 回饋最高</div>
         <div class="wc2-name">${w.card.name}</div>
@@ -1721,11 +1730,11 @@ function renderSearchResult(){
     const nc=r.net>0.1?'#16a34a':(r.net<-0.05?'#dc2626':'#6b7280');
     html.push(`<div class="rrow${i===0?' top':''}">
       <div class="rrk">${i+1}</div>
-      <div class="rst2" style="background:${r.card.color}"></div>
+      <div class="rst2" style="background:${r.card.color||'#64748b'}"></div>
       <div class="rinfo">
         <div class="rname">${r.card.name}</div>
         <div class="rbank">${r.card.bank}</div>
-        <div class="rmeta">${capA?`上限 NT$${r.capAmt.toLocaleString()}/月`:'無上限'}${e2?` · 至 ${e2}`:''}${r.reg?' · 需登錄':''}</div>
+        <div class="rmeta">${capA?`上限 NT$${r.capAmt.toLocaleString()}/月`:(parseCap(r.note)?'上限 '+parseCap(r.note):'無上限')}${e2?` · 至 ${e2}`:''}${r.reg?' · 需登錄':''}</div>
       </div>
       <div class="rrate" style="color:${nc}">${r.net.toFixed(1)}<span style="font-size:12px">%</span></div>
     </div>`);
