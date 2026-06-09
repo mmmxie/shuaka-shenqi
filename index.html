@@ -633,7 +633,7 @@ const CARD_DB = [
      overseas_flight:{rate:3.3,note:'切換「玩旅刷」方案（需 L2，須設台新帳戶自扣）'},
      overseas_hotel:{rate:3.3,note:'切換「玩旅刷」方案（需 L2，須設台新帳戶自扣）'},
      overseas_default:{rate:3.3,note:'切換「玩旅刷」方案（需 L2，須設台新帳戶自扣）'},
-     tw_cvs:{rate:3.8,note:'切換「Pay著刷」，使用台新 Pay（四大超商適用，無單筆金額限制）；或 LINE Pay 最高 2.3%（L2，至 2026/06）'},
+     tw_cvs:{rate:3.8,note:'切換「Pay著刷」，使用台新 Pay（四大超商適用，無單筆金額限制）；LINE Pay 最高 2.3%（L2）（活動至 2026/06）'},
      tw_dining:{rate:3.3,note:'切換「好饗刷」方案'},
      tw_digital:{rate:3.3,note:'切換「數趣刷」方案'},
      tw_shopee:{rate:3.3,note:'切換「數趣刷」方案'},
@@ -674,7 +674,7 @@ const CARD_DB = [
    officialUrl:'https://www.dbs.com.tw/personal-zh/cards/dbs_eco/index.html',
    defaultRate:1.0,capKey:'overseas_physical',capAmt:600,capBonusOnly:true,capBonusPct:4,capBaseRate:1.0,
    overrides:{
-     overseas_physical:{rate:5.0,note:'實體消費 5%，月加碼上限 NT$600，超過後僅 1%'},
+     overseas_physical:{rate:5.0,note:'實體消費 5%，回饋上限 NT$600/期，超過後僅 1%'},
      overseas_online:{rate:1.0,note:'線上購物不適用 5%，僅基本 1%'},
      overseas_subscription:{rate:1.0},
      overseas_apple:{rate:1.0},
@@ -690,7 +690,7 @@ const CARD_DB = [
    defaultRate:1.0,capKey:'overseas_physical',capAmt:600,capBonusOnly:true,capBonusPct:4,capBaseRate:1.0,
    overrides:{
      tw_costco:{rate:2.0,note:'Costco 消費 2% 好多金'},
-     overseas_physical:{rate:5.0,note:'海外實體 5%，月加碼上限 NT$600，超過後僅 1%'},
+     overseas_physical:{rate:5.0,note:'海外實體 5%，回饋上限 NT$600/期，超過後僅 1%'},
      tw_default:{rate:1.0},
    }},
   // ─── 將來銀行 ───
@@ -723,11 +723,11 @@ const CARD_DB = [
    officialUrl:'https://bank.sinopac.com/sinopacBT/personal/credit-card/introduction/bankcard/dual-currency-card.html',
    defaultRate:2.0,capKey:'overseas_physical',capAmt:300,capBonusOnly:true,capBonusPct:4,capBaseRate:2.0,
    overrides:{
-     overseas_physical:{rate:6.0,note:'精選通路 2%+4%=6%（實體：一般海外實體商店；⚠️ L1 月加碼上限 NT$300；L2 NT$800）'},
-     overseas_online:{rate:6.0,note:'精選網購通路 6%：Amazon、Rakuten、Mercari、eBay、iHerb、Selfridge、Gmarket、Olive Young、淘寶、SUICA/PASMO/ICOCA 儲值、大國藥妝、Sugi藥妝、Klook、KKDAY、Booking.com、Agoda、Airbnb、Expedia、Trip.com、Trivago 等（L1 月加碼上限 NT$300）'},
-     overseas_flight:{rate:6.0,note:'航空公司購票 6%（含月上限，L1 NT$300）'},
-     overseas_flight_budget:{rate:6.0,note:'廉航購票 6%（含月上限，L1 NT$300）'},
-     overseas_hotel:{rate:6.0,note:'Booking.com/Agoda/Airbnb 等 6%（含月上限，L1 NT$300）'},
+     overseas_physical:{rate:6.0,note:'精選通路 2%+4%=6%（實體：一般海外實體商店；⚠️ 回饋上限 NT$300/期（L1），NT$800/期（L2））'},
+     overseas_online:{rate:6.0,note:'精選網購通路 6%：Amazon、Rakuten、Mercari、eBay、iHerb、Selfridge、Gmarket、Olive Young、淘寶、SUICA/PASMO/ICOCA 儲值、大國藥妝、Sugi藥妝、Klook、KKDAY、Booking.com、Agoda、Airbnb、Expedia、Trip.com、Trivago 等；回饋上限 NT$300/期（L1）'},
+     overseas_flight:{rate:6.0,note:'航空公司購票 6%（L1，回饋上限 NT$300/期）'},
+     overseas_flight_budget:{rate:6.0,note:'廉航購票 6%（L1，回饋上限 NT$300/期）'},
+     overseas_hotel:{rate:6.0,note:'Booking.com/Agoda/Airbnb 等 6%（L1，回饋上限 NT$300/期）'},
      overseas_default:{rate:2.0,note:'非精選通路海外消費 2%，無上限'},
      tw_default:{rate:1.0,note:'國內一般消費 1%'},
    }},
@@ -785,7 +785,7 @@ const CARD_DB = [
    officialUrl:'https://www.esunbank.com/zh-tw/personal/credit-card/intro/bank-card/unicard',
    defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
-     overseas_physical:{rate:3.5,reg:true,regNote:'UP 選加碼 3.5%（⚠️ 英/歐洲 28 國實體消費無基礎 1%，整體僅 3.5%；非百大特店門市無任何回饋）；月上限 5,000 點；需訂閱 UP 選（149 e point/月，或達免費任務）；有效至 2026/06'},
+     overseas_physical:{rate:3.5,reg:true,regNote:'UP 選加碼 3.5%（⚠️ 英/歐洲 28 國實體消費無基礎 1%，整體僅 3.5%；非百大特店門市無任何回饋）；月上限 5,000 點；需訂閱 UP 選（149 e point/月，或達免費任務）（活動至 2026/06）'},
      overseas_online:{rate:4.5,reg:true,regNote:'基礎 1%+UP 選 3.5%=4.5%（線上消費不受歐洲除外限制，含 Amazon、eBay 等百大特店）；月上限 5,000 點'},
      overseas_subscription:{rate:4.5,reg:true,regNote:'基礎 1%+UP 選 3.5%=4.5%；月上限 5,000 點'},
      overseas_hotel:{rate:4.5,reg:true,regNote:'基礎 1%+UP 選 3.5%=4.5%（Booking.com、Agoda、Airbnb 等百大特店）；月上限 5,000 點'},
@@ -865,7 +865,7 @@ const CARD_DB = [
    officialUrl:'https://creditcards.com.tw/creditcard/fubon-j-japan-korea-midnight-credit-card-cashback/',
    defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
-     overseas_physical:{rate:1.0,reg:true,note:'⚠️ 6% 僅限日本/韓國/泰國等指定亞洲國家，英/歐/北美實體僅基本 1%',regNote:'每季登錄一次（每月 20 日 16:00 開放，每月限量 20,000 名）；登錄頁：cardpromote.taipeifubon.com.tw/promotion/Detail?sn=C000307 或 Fubon+ App；日韓泰實體 6%，單筆滿 NT$1,000，每季加碼上限 NT$1,000；有效至 2026/09'},
+     overseas_physical:{rate:1.0,reg:true,note:'⚠️ 6% 僅限日本/韓國/泰國等指定亞洲國家，英/歐/北美實體僅基本 1%',regNote:'每季登錄一次（每月 20 日 16:00 開放，每月限量 20,000 名）；登錄頁：cardpromote.taipeifubon.com.tw/promotion/Detail?sn=C000307 或 Fubon+ App；日韓泰實體 6%，單筆滿 NT$1,000，每季加碼上限 NT$1,000（活動至 2026/09）'},
      overseas_flight:{rate:3.0,note:'日韓航空購票 3%（含廉航 Peach/Jetstar/Jeju Air 等）'},
      overseas_flight_budget:{rate:3.0,note:'日韓廉航購票 3%（Peach、Jetstar Japan、濟州航空等）'},
      overseas_hotel:{rate:1.0},
@@ -930,7 +930,7 @@ const DC = [
    defaultRate:1.0,
    capKey:'overseas_physical', capAmt:600, capBonusOnly:true, capBonusPct:4, capBaseRate:1.0,
    overrides:{
-     overseas_physical:{rate:5.0,note:'英/歐/日/韓/新/泰/美洲 實體消費，月回饋上限 NT$600（4%加碼），超過後僅 1%'},
+     overseas_physical:{rate:5.0,note:'英/歐/日/韓/新/泰/美洲 實體消費，回饋上限 NT$600/期（4%加碼），超過後僅 1%'},
      overseas_online:{rate:1.0,note:'線上購物不適用 5%，僅基本 1%'},
      overseas_subscription:{rate:1.0,note:'訂閱不適用 5%'},
      overseas_apple:{rate:1.0,note:'Apple 線上不適用 5%'},
@@ -1004,7 +1004,7 @@ const DC = [
    capKey:'overseas_physical',capAmt:600,capBonusOnly:true,capBonusPct:4,capBaseRate:1.0,
    overrides:{
      tw_costco:{rate:2.0,note:'Costco 賣場 2%（線上 3%）好多金，只能折抵 Costco 消費'},
-     overseas_physical:{rate:5.0,note:'海外實體 5%（⚠️ 每月 1 日 00:00 搶登錄，限量 50,000 名；登錄頁：cardpromote.taipeifubon.com.tw/promotion/Detail?sn=C000270 或 Fubon+ App；搶不到僅 1%；好多金只能折抵 Costco），月加碼上限 NT$600'},
+     overseas_physical:{rate:5.0,note:'海外實體 5%（⚠️ 每月 1 日 00:00 搶登錄，限量 50,000 名；登錄頁：cardpromote.taipeifubon.com.tw/promotion/Detail?sn=C000270 或 Fubon+ App；搶不到僅 1%；好多金只能折抵 Costco），回饋上限 NT$600/期'},
      tw_default:{rate:1.0},
      overseas_default:{rate:1.0},
    }},
