@@ -1606,13 +1606,46 @@ function render(){
    ============================ */
 let SIDX=[];
 function sEsc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+// 同義詞 / 英文別名：依 rate-key（跨地區共用）
+const ALIAS_RK={
+  overseas_subscription:'netflix spotify disney disney+ youtube premium apple music chatgpt openai claude gemini steam nintendo playstation google one 訂閱 串流 月費 subscription',
+  overseas_online:'amazon ebay shein asos zalando online 線上 網購 電商 蝦皮 lazada',
+  overseas_physical:'實體 商店 店面 supermarket grocery 超市 百貨 outlet',
+  overseas_apple:'apple iphone ipad mac macbook airpods app store appstore icloud itunes 蘋果',
+  overseas_hotel:'booking booking.com agoda airbnb hotels expedia trip.com 訂房 飯店 旅館 hotel',
+  overseas_flight:'機票 航空 班機 flight airline airfare 訂機票',
+  overseas_flight_budget:'廉航 廉價航空 ryanair easyjet airasia scoot peach jetstar',
+  overseas_flight_eva:'長榮 eva air 長榮航空',
+  overseas_insurance:'保險 保費 insurance premium',
+  overseas_train:'高鐵 火車 鐵路 eurostar train rail',
+  tw_cvs:'7-11 7eleven 7-eleven seven eleven 711 統一超商 familymart family mart 全家 萊爾富 hi-life ok超商 超商 便利商店 便利店 小七 convenience',
+  tw_dining:'mcdonald mcdonalds 麥當勞 kfc 肯德基 starbucks 星巴克 louisa 路易莎 cama mos 摩斯 burger king 必勝客 pizza hut dominos 達美樂 subway 餐廳 美食 咖啡 速食 dining restaurant cafe',
+  tw_shopee:'shopee 蝦皮 momo pchome 露天 拍賣 網購 電商',
+  tw_costco:'costco 好市多 大賣場 量販 賣場',
+  tw_digital:'apple klook kkday agoda 數位 線上',
+  tw_insurance:'保險 保費 壽險 車險 意外險 insurance',
+};
+// 依情境 id（地區專屬）
+const ALIAS_ID={
+  uk_sup:'tesco asda sainsbury sainsburys lidl aldi waitrose morrisons co-op supermarket 超市',
+  uk_rst:'pret costa starbucks greggs nando restaurant cafe 餐廳 咖啡',
+  uk_amz:'amazon amazon.co.uk 亞馬遜 網購',
+  uk_trn:'tfl oyster tube underground national rail uber 地鐵 交通',
+  uk_fue:'bp shell esso petrol diesel 加油 fuel',
+  uk_pha:'boots superdrug 藥局 pharmacy',
+  jp_phy:'便利店 唐吉訶德 donki 藥妝 松本清 matsukiyo 唐吉軻德 super 超市 餐廳',
+  jp_onl:'樂天 rakuten amazon zozotown 網購',
+  na_onl:'amazon walmart target costco 網購',
+  kr_onl:'coupang naver 網購',
+};
 function buildSearchIndex(){
   SIDX=[];
   Object.keys(SC).forEach(rid=>{
     const reg=REGIONS.find(r=>r.id===rid); if(!reg)return;
     (SC[rid]||[]).forEach(s=>{
+      const alias=(ALIAS_ID[s.id]||'')+' '+(ALIAS_RK[s.rk]||'');
       SIDX.push({rid,reg,scen:s,label:s.l,ex:s.ex||'',
-        hay:(reg.l+' '+s.l+' '+(s.ex||'')).toLowerCase()});
+        hay:(reg.l+' '+s.l+' '+(s.ex||'')+' '+alias).toLowerCase()});
     });
   });
 }
@@ -1631,6 +1664,14 @@ function parseCap(note){
   m=note.match(/(?:回饋上限|加碼上限|上限)[^0-9]*([0-9][0-9,]*)\s*點/);
   if(m)return m[1]+' 點 / 期';
   return null;
+}
+// 把文字中的網址/裸網域轉成可點連結（已先做 HTML escape）
+function linkify(text){
+  if(!text)return '';
+  return sEsc(text).replace(
+    /(https?:\/\/[^\s）)，、]+|(?:[a-z0-9-]+\.)+(?:com|tw|net|org|io|app)(?:\/[^\s）)，、]*)?)/gi,
+    m=>{const href=m.startsWith('http')?m:'https://'+m;
+      return `<a href="${href}" target="_blank" rel="noopener" style="color:#2563eb;text-decoration:underline">${m}</a>`;});
 }
 function quickSearch(q){
   const si=document.getElementById('srch'); if(si)si.value=q;
@@ -1699,6 +1740,14 @@ function renderSearchResult(){
   const capStr=wCapApplies?`NT$${w.capAmt.toLocaleString()} / 月`:(parseCap(w.note)||'此情境無上限');
   const exp=parseExpiry(w.note)||parseExpiry(w.regNote);
   const expStr=exp?exp:'<span style="color:#9ca3af">未標示期限</span>';
+  // 達上限後改用哪張（第二高且淨回饋為正的不同卡）
+  const hasCap=wCapApplies||!!parseCap(w.note);
+  const alt=ranked.find(r=>r.card.id!==w.card.id&&r.net>0.1);
+  const capHint=hasCap?`<div class="wc2-note" style="background:#fff7ed;color:#9a3412">⚠️ 此卡有回饋上限（${capStr}）${alt?`，刷爆後改用 <strong>${alt.card.name}</strong>（${alt.net.toFixed(1)}%）最划算`:''}。</div>`:'';
+  // 登錄提醒（醒目 + 連結）
+  const regBanner=(w.reg&&w.regNote)?`<div class="wc2-note" style="background:#eff6ff;color:#1e40af">📋 <strong>需先登錄才有此回饋</strong>：${linkify(w.regNote)}</div>`:'';
+  // 官網連結（驗證來源）
+  const official=w.card.officialUrl?`<a href="${w.card.officialUrl}" target="_blank" rel="noopener" style="display:inline-block;margin-top:12px;font-size:12px;color:#2563eb;text-decoration:none;font-weight:600">🔗 查官網確認最新條件 ↗</a>`:'';
   const html=[];
   html.push(`<div class="rsum-cx"><span class="rsum-f">${reg.f}</span> ${scen.l}</div>`);
   html.push(`<div class="wc2">
@@ -1719,8 +1768,10 @@ function renderSearchResult(){
       <div class="wc2-cell"><div class="wc2-k">回饋到期日</div><div class="wc2-v">${expStr}</div></div>
     </div>
     ${w.note?`<div class="wc2-note">ℹ️ ${w.note}</div>`:''}
-    ${w.reg&&w.regNote?`<div class="wc2-note">📋 需登錄：${w.regNote}</div>`:''}
+    ${regBanner}
+    ${capHint}
     ${w.isRestricted?`<div class="wc2-note">⚠️ 回饋形式為「${w.rewardLabel}」，並非現金，請評估使用場合。</div>`:''}
+    ${official}
   </div>`);
   html.push(`<div class="lbl" style="margin:16px 16px 0">完整比較（${ranked.length} 張卡）</div>`);
   html.push('<div class="rlist">');
