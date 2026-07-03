@@ -246,7 +246,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","
 <header class="hdr">
   <div class="hdr-logo">💳 刷<em>卡</em>神器</div>
   <div style="display:flex;align-items:center;gap:10px">
-    <span style="font-size:11px;opacity:.5">資料截至 2026/06</span>
+    <span style="font-size:11px;opacity:.5">資料截至 2026/07</span>
     <a href="https://github.com/mmmxie/shuaka-shenqi" target="_blank" style="font-size:11px;opacity:.5;color:inherit;text-decoration:none">GitHub</a>
   </div>
 </header>
@@ -334,7 +334,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","
     <button class="schip" onclick="quickSearch('日本')">🇯🇵 日本</button>
   </div>
   <div id="res"></div>
-  <div class="fn">回饋率以各銀行官網最新公告為準 · 2026/06</div>
+  <div class="fn">回饋率以各銀行官網最新公告為準 · 2026/07</div>
 </div>
 
 <!-- MY CARDS -->
@@ -381,7 +381,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","
       <div class="srs">
         台灣信用卡海外消費通常收 <strong>1.5%</strong> 外幣手續費，已自動扣除。<br>
         例外：<strong>蝦皮聯名卡免手續費</strong>，<strong>Revolut 無手續費且無回饋</strong>。<br><br>
-        <strong>eco 月回饋上限</strong>：4% 加碼上限 NT$600／月，約消費 NT$15,000 達頂。
+        <strong>eco 月回饋上限</strong>：4% 加碼上限 NT$800／月，約消費 NT$20,000 達頂。
         超過後仍有 1% 基本，但扣 1.5% 手續費後為 -0.5%，此時改用 Richart 玩旅刷（1.8% 淨）。
       </div>
     </div>
@@ -454,7 +454,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","
     </button>
     <div class="sep"></div>
     <div style="font-size:12px;color:var(--sub);margin-bottom:8px">
-      <strong>特殊上限設定</strong>（如 eco 的 4% 加碼 NT$600 月上限）：
+      <strong>特殊上限設定</strong>（如 eco 的 4% 加碼 NT$800 月上限）：
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <div style="flex:1;min-width:140px">
@@ -615,7 +615,7 @@ const RKEYS = [
 function rkLabel(k){ return (RKEYS.find(x=>x.k===k)||{l:k}).l; }
 
 /* ============================
-   CARD DATABASE (verified 2026/05)
+   CARD DATABASE (verified 2026/07)
    新增卡片時從此選取，資料自動帶入
    ============================ */
 const CARD_DB = [
@@ -672,9 +672,9 @@ const CARD_DB = [
   {id:'eco',bank:'星展銀行',name:'eco 永續卡',
    color:'#DA1710',fee:1.5,rewardType:'cash',rewardLabel:'現金積點',
    officialUrl:'https://www.dbs.com.tw/personal-zh/cards/dbs_eco/index.html',
-   defaultRate:1.0,capKey:'overseas_physical',capAmt:600,capBonusOnly:true,capBonusPct:4,capBaseRate:1.0,
+   defaultRate:1.0,capKey:'overseas_physical',capAmt:800,capBonusOnly:true,capBonusPct:4,capBaseRate:1.0,
    overrides:{
-     overseas_physical:{rate:5.0,note:'實體消費 5%，回饋上限 NT$600/期，超過後僅 1%'},
+     overseas_physical:{rate:5.0,note:'實體消費 5%，回饋上限 NT$800/期，超過後僅 1%'},
      overseas_online:{rate:1.0,note:'線上購物不適用 5%，僅基本 1%'},
      overseas_subscription:{rate:1.0},
      overseas_apple:{rate:1.0},
@@ -920,7 +920,7 @@ const CARD_DB = [
 ];
 
 /* ============================
-   DEFAULT CARDS (verified 2026/05)
+   DEFAULT CARDS (verified 2026/07)
    ============================ */
 const DC = [
   // ── eco 永續卡 ──────────────────────
@@ -928,9 +928,9 @@ const DC = [
    fee:1.5,owned:true,rewardType:'cash',rewardLabel:'現金積點',
    officialUrl:'https://www.dbs.com.tw/personal-zh/cards/dbs_eco/index.html',
    defaultRate:1.0,
-   capKey:'overseas_physical', capAmt:600, capBonusOnly:true, capBonusPct:4, capBaseRate:1.0,
+   capKey:'overseas_physical', capAmt:800, capBonusOnly:true, capBonusPct:4, capBaseRate:1.0,
    overrides:{
-     overseas_physical:{rate:5.0,note:'英/歐/日/韓/新/泰/美洲 實體消費，回饋上限 NT$600/期（4%加碼），超過後僅 1%'},
+     overseas_physical:{rate:5.0,note:'英/歐/日/韓/新/泰/美洲 實體消費，回饋上限 NT$800/期（4%加碼），超過後僅 1%'},
      overseas_online:{rate:1.0,note:'線上購物不適用 5%，僅基本 1%'},
      overseas_subscription:{rate:1.0,note:'訂閱不適用 5%'},
      overseas_apple:{rate:1.0,note:'Apple 線上不適用 5%'},
