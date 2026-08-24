@@ -12,7 +12,7 @@
 set -uo pipefail
 
 REPO="/Users/m.hsieh/Downloads/Mark-Agent/shuaka-repo"
-DATA_FILE="index.html"      # 階段 2 把 CARD_DB 抽成 data/cards.js 後改這裡
+DATA_FILE="data/cards.js"   # 只有資料，不含程式碼。AI 每天只讀改這個檔。
 LOG_DIR="$REPO/ci/logs"
 STATUS="$REPO/ci/LAST-RUN.md"
 
