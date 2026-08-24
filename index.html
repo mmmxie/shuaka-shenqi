@@ -1098,6 +1098,13 @@ function nextHit(b,now){
   return null;
 }
 
+// 下一個「星期 N」（1=週一…7=週日）。今天就是的話回今天。
+function nextDow(dow,now){
+  const d=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  for(let i=0;i<8;i++){ if(dowOf(d)===dow)return d; d.setDate(d.getDate()+1); }
+  return null;
+}
+
 // 下一個「每月第 N 日」。這個月的還沒過就回這個月，過了就回下個月。
 function nextDom(dom,now){
   const d=new Date(now.getFullYear(),now.getMonth(),dom);
@@ -1164,9 +1171,14 @@ function renderToday(){
     const btn=b.reg&&b.reg.url
       ? `<a href="${b.reg.url}" target="_blank" rel="noopener" style="background:#b45309;color:#fff;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:700;text-decoration:none;margin-left:6px">登錄 ↗</a>`:'';
     // 登錄開放日：今天就開放的話要喊得大聲一點（富邦那種限量 5 萬名的，晚幾小時就沒了）
-    const od=b.reg&&b.reg.opensDom;
-    const opensToday=od&&now.getDate()===od;
-    const opensNext=od&&!opensToday?nextDom(od,now):null;
+    // 支援兩種節奏：每月第 N 日（opensDom）與每週星期 N（opensDow，例：中信每週二）
+    const od=b.reg&&b.reg.opensDom, ow=b.reg&&b.reg.opensDow;
+    const opensToday=(od&&now.getDate()===od)||(ow&&dowOf(now)===ow);
+    let opensNext=null;
+    if(!opensToday){
+      if(od)opensNext=nextDom(od,now);
+      else if(ow)opensNext=nextDow(ow,now);
+    }
     const head=opensToday
       ? `🔴 <strong>今天開放登錄，快去搶</strong>`
       : (opensNext?`🟡 <strong>${fmtDate(opensNext)} 開放登錄</strong>`:`🟡 <strong>還沒登錄</strong>`);
@@ -1622,9 +1634,13 @@ function renderSearchResult(){
   const official=w.card.officialUrl?`<a href="${w.card.officialUrl}" target="_blank" rel="noopener" style="display:inline-block;margin-top:12px;font-size:12px;color:#2563eb;text-decoration:none;font-weight:600">🔗 查官網確認最新條件 ↗</a>`:'';
   // 資料可信度：查核過的就寫明日期，沒查核過的就老實說沒有。
   // 不標示等於默認「這數字可信」，那是誤導 —— 使用者有權知道哪些數字沒人對過官網。
-  const prov=w.card.checkedAt
-    ? `<div style="margin-top:6px;font-size:11px;color:#6b7280">✔️ 已對官網查核：${w.card.checkedAt}</div>`
-    : `<div style="margin-top:6px;font-size:11px;color:#b45309">⚠️ 這張卡尚未對官網逐項查核，數字僅供參考</div>`;
+  // unverified = 查核時官網打不開或查無此卡，數字沒有任何官方依據。
+  // 這比「尚未查核」更嚴重，要講得更白，不能讓人以為只是還沒排到。
+  const prov=w.card.unverified
+    ? `<div class="wc2-note" style="background:#fef2f2;color:#991b1b">🚫 <strong>這張卡的數字未經核實</strong><br style="line-height:1.8">查核時官網無法存取或查無此卡，以下回饋率沒有官方依據，請勿據此做決定。</div>`
+    : (w.card.checkedAt
+      ? `<div style="margin-top:6px;font-size:11px;color:#6b7280">✔️ 已對官網查核：${w.card.checkedAt}</div>`
+      : `<div style="margin-top:6px;font-size:11px;color:#b45309">⚠️ 這張卡尚未對官網逐項查核，數字僅供參考</div>`);
   const html=[];
   html.push(`<div class="rsum-cx"><span class="rsum-f">${reg.f}</span> ${scen.l}</div>`);
   html.push(`<div class="wc2">

@@ -136,28 +136,41 @@ const CARD_DB = [
   // ─── 國泰世華 ───
   {id:'cube',bank:'國泰世華',name:'CUBE 卡 Level 2',
    color:'#003087',fee:1.5,rewardType:'points',rewardLabel:'小樹點（可折抵帳單）',
-   officialUrl:'https://www.cathaybk.com.tw/cathaybk/personal/product/creditcard/cards/cube/',
-   defaultRate:0.5,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   officialUrl:'https://www.cathaybk.com.tw/cathaybk/personal/product/credit-card/cards/cube/',
+   source:'https://www.cathaybk.com.tw/cathaybk/personal/product/credit-card/cards/cube/',checkedAt:'2026-08-24',
+   // 2026-08-24 查核：原 officialUrl 用 creditcard（無連字號）回「找不到此頁面」，已修正。
+   // 一般消費原寫 0.5%／海外 1.0%，官網明文「一般消費享0.3%小樹點(信用卡)，回饋無上限」，
+   // 高估近 3 倍，會污染所有沒有加碼的比較結果。
+   // 另：官網 CUBE 權益方案清單完全沒有「好市多」，該情境已移除。
+   defaultRate:0.3,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
-     overseas_physical:{rate:3.0,reg:true,regNote:'每次消費前在 CUBE App 切換「趣旅行」（App 首頁 > CUBE 卡權益方案 > 趣旅行），每日限切一次；未切換無旅遊加碼'},
-     overseas_flight:{rate:3.0,reg:true,regNote:'CUBE App 切換「趣旅行」，航空公司 3%（含廉航），每日限切一次'},
-     overseas_flight_budget:{rate:3.0,reg:true,regNote:'CUBE App 切換「趣旅行」，廉航 3%，每日限切一次'},
-     overseas_hotel:{rate:3.0,reg:true,regNote:'CUBE App 切換「趣旅行」，Agoda/Booking.com/Hotels.com 3%，每日限切一次'},
-     overseas_online:{rate:1.0,note:'線上購物不適用趣旅行'},
-     overseas_default:{rate:1.0},
-     tw_costco:{rate:3.0,reg:true,regNote:'CUBE App 設定「好市多」類別，3% 無上限'},
-     tw_shopee:{rate:3.0,reg:true,regNote:'CUBE App 設定「蝦皮購物」類別，3% 無上限'},
-     tw_dining:{rate:3.0,reg:true,regNote:'CUBE App 設定「樂饗購」類別（餐廳），3% 無上限'},
-     tw_digital:{rate:3.0,reg:true,regNote:'CUBE App 設定「玩數位」類別（Apple、Klook、KKday 等），3% 無上限'},
-     tw_default:{rate:0.5},
+     overseas_physical:{rate:3.0,reg:true,regNote:'每次消費前在 CUBE App 切換「趣旅行」（App 首頁 > CUBE 卡權益方案 > 趣旅行），每日限切一次；未切換無旅遊加碼。⚠️ Level 2 需以國泰世華帳戶設定自動扣繳或用 CUBE App 繳本人卡費，否則 Level 1 僅 2%。每月指定消費累計上限＝當日信用額度＋NT$50 萬，超出僅 0.3%'},
+     overseas_flight:{rate:3.0,reg:true,regNote:'CUBE App 切換「趣旅行」，航空公司 3%（含廉航），每日限切一次；Level 1 僅 2%'},
+     overseas_flight_budget:{rate:3.0,reg:true,regNote:'CUBE App 切換「趣旅行」，廉航 3%，每日限切一次；Level 1 僅 2%'},
+     // 2026-08-24 查核：官網「趣旅行」清單無 Hotels.com（全站 0 命中），已改為官網實際清單
+     overseas_hotel:{rate:3.0,reg:true,regNote:'CUBE App 切換「趣旅行」，Agoda／Airbnb／Booking.com／Trip.com／Klook 3%，每日限切一次；Level 1 僅 2%'},
+     overseas_online:{rate:0.3,note:'線上購物不適用趣旅行，僅一般消費 0.3%'},
+     overseas_default:{rate:0.3,note:'一般消費 0.3% 小樹點，無上限'},
+     tw_shopee:{rate:3.0,reg:true,regNote:'CUBE App 切換「玩數位」權益方案（蝦皮為其網購平台通路之一）；Level 1 僅 2%'},
+     tw_dining:{rate:3.0,reg:true,regNote:'CUBE App 設定「樂饗購」類別（餐廳）；Level 1 僅 2%'},
+     // 2026-08-24 查核：Klook 實際屬「趣旅行」不是「玩數位」；KKday 官網 0 命中
+     tw_digital:{rate:3.0,reg:true,regNote:'CUBE App 設定「玩數位」類別（Apple 媒體服務、蝦皮購物、momo、PChome、AI 工具、串流平台）。⚠️ Klook 屬「趣旅行」、KKday 不在清單內；Level 1 僅 2%'},
+     overseas_subscription:{rate:0.3,note:'訂閱不適用趣旅行，僅一般消費 0.3%'},
+     overseas_apple:{rate:0.3,note:'Apple 線上不適用趣旅行，僅一般消費 0.3%'},
+     overseas_insurance:{rate:0.3,note:'保費不適用加碼，僅一般消費 0.3%'},
+     tw_cvs:{rate:3.0,reg:true,regNote:'CUBE App 設定對應類別，最多選 3 類；Level 1 僅 2%'},
+     tw_default:{rate:0.3,note:'一般消費 0.3% 小樹點，無上限'},
    }},
   {id:'shopee',bank:'國泰世華',name:'蝦皮購物聯名卡',
    color:'#EE4D2D',fee:0,rewardType:'restricted',rewardLabel:'蝦幣（限蝦皮平台使用）',
-   officialUrl:'https://www.cathaybk.com.tw/cathaybk/personal/product/creditcard/cards/shopee/',
+   officialUrl:'https://www.cathaybk.com.tw/cathaybk/personal/product/credit-card/cards/shopee/',
    defaultRate:0.5,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
      tw_shopee:{rate:2.0,note:'蝦皮購物 2% 蝦幣'},
      overseas_default:{rate:0.5,note:'海外手續費 0%（免收），回饋僅 0.5% 蝦幣'},
+     tw_cvs:{rate:2.0,note:'超商 2% 蝦幣'},
+     overseas_physical:{rate:0.5,note:'0.5% 蝦幣 + 免海外手續費（蝦幣僅能用於蝦皮）'},
+     overseas_online:{rate:0.5,note:'0.5% 蝦幣 + 免海外手續費'},
      tw_default:{rate:0.5},
    }},
   // ─── 星展銀行 ───
@@ -208,9 +221,9 @@ const CARD_DB = [
      tw_default:{rate:1.0},
    }},
   // ─── 富邦銀行 ───
-  {id:'costco',bank:'富邦銀行',name:'Costco 聯名卡',
+  {id:'costco',bank:'台北富邦',name:'Costco 聯名卡',
    color:'#005DAA',fee:1.5,rewardType:'restricted',rewardLabel:'好多金（限 Costco 使用）',
-   officialUrl:'https://www.fubon.com/banking/personal/credit-card/costco/',
+   officialUrl:'https://www.fubon.com/banking/Personal/credit_card/all_card/Costco/costco.htm',
    defaultRate:1.0,capKey:'overseas_physical',capAmt:600,capBonusOnly:true,capBonusPct:4,capBaseRate:1.0,
    overrides:{
      tw_costco:{rate:2.0,note:'Costco 消費 2% 好多金'},
@@ -236,10 +249,14 @@ const CARD_DB = [
   {id:'jiangjiang',bank:'將來銀行',name:'將將卡',
    color:'#00C1B2',fee:1.5,rewardType:'points',rewardLabel:'N點（可折抵帳單）',
    officialUrl:'https://www.nextbank.com.tw/product/point',
-   defaultRate:1.5,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   source:'https://www.nextbank.com.tw/announcement/45c1e31fa40000000285cadc56793797/event1186',checkedAt:'2026-08-24',
+   // 2026-08-24 查核更正：1.5% 是「大將卡」的國內數字（0.5%+加碼1%，且加碼另有
+   // 前月台幣活存日均 30 萬的資產門檻），被誤抄到將將卡。將將卡官方活動頁明文
+   // 「Part 1-基本回饋 0.5%」，兩個情境原本都高估 3 倍。
+   defaultRate:0.5,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
-     tw_default:{rate:1.5,note:'一般消費 1.5%，以官網最新公告為準'},
-     overseas_default:{rate:1.5},
+     tw_default:{rate:0.5,note:'基本回饋 0.5%（官方活動頁明文。⚠️ 1.5% 是另一張「大將卡」的數字，且該卡加碼另有前月台幣活存日均 30 萬的門檻）'},
+     overseas_default:{rate:0.5,note:'基本回饋 0.5%'},
    }},
   // ─── Mercedes ───
   {id:'mercedes',bank:'台新銀行',name:'Mercedes-Benz 御璽卡',
@@ -251,8 +268,17 @@ const CARD_DB = [
      tw_default:{rate:0.3,note:'基本 1x 積點 = 0.3%'},
    }},
   // ─── Revolut ───
+  // 2026-08-24 查核：「0% 手續費」是有條件的，原本的無條件標示會誤導。
+  // Standard 方案每月只有 £1,000 免費換匯額度，超過收 1%，
+  // 且該額度是法幣＋加密貨幣＋貴金屬跨資產累計，不是單看外幣。
+  // 週末加價：EEA 版條款寫「1%, regardless of your plan」，但英國版 help 頁
+  // 說法不同（Premium 以上免費、Plus 0.5%）。revolut.com 與 help.revolut.com
+  // 對自動化存取回 403 + JS challenge，拿不到英國版原文 ——
+  // 依「查不到就不寫」原則，這裡只寫「週末另有加價」，不寫死百分比。
   {id:'revolut',bank:'Revolut',name:'英鎊帳戶（簽帳金融卡）',
-   color:'#191C1F',fee:0,rewardType:'cash',rewardLabel:'無回饋（0% 手續費）',
+   color:'#191C1F',fee:0,rewardType:'cash',rewardLabel:'無回饋（免費額度內 0% 手續費）',
+   note:'⚠️ Standard 方案每月免費換匯額度為 £1,000（法幣＋加密＋貴金屬跨資產累計），超過部分收 1%。週末另有加價，實際費率依你的方案而定，請於 App 內確認。',
+   source:'https://cdn.revolut.com/terms_and_conditions/pdf/personal_fees_standard_80e14d41_2.6.3_1718717500_en.pdf',checkedAt:'2026-08-24',
    officialUrl:'https://www.revolut.com/en-GB/',isRevolut:true,
    defaultRate:0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{}},
@@ -281,12 +307,31 @@ const CARD_DB = [
    officialUrl:'https://www.ctbcbank.com/content/twrbo/zh_tw/cc_index/cc_product/cc_introduction_index/C_LINEPay.html',
    defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
-     overseas_physical:{rate:2.8,note:'海外實體 2.8%（含基本 1%+加碼 1.8%，⚠️ 限面對面刷卡，Apple Pay/Google Pay 於實體店適用）'},
+     overseas_physical:{rate:2.8,note:'海外實體 2.8%（含基本 1%+加碼 1.8%，⚠️ 限面對面刷卡，Apple Pay/Google Pay 於實體店適用）',
+       boosts:[{
+         id:'ctbc-linepay-oversea-5pct',
+         label:'國外實體 5%（每週二搶登錄）',
+         rate:5.0, baseRate:2.8,
+         // ⚠️ 這是最容易被寫錯的一種：「每週二」指的是【登錄開放日】，
+         // 不是「只有週二刷卡才有 5%」。登錄成功後整個活動期間都算，
+         // 所以用 reg.opensDow 而不是 when.dow。
+         reg:{period:'once', opensDow:2,
+              url:'https://www.ctbcbank.com/content/twrbo/zh_tw/cc_index/cc_product/cc_introduction_index/C_LINEPay.html',
+              note:'每週二 00:00 開放 3,000 個登錄名額，搶到後整個活動期間都適用，不需每週重搶',
+              quota:'每週二釋出 3,000 名，活動總量 20,000 名'},
+         cap:{amt:450,per:'campaign',unit:'點',note:'加碼 2.2% 的部分整個活動期間每歸戶上限 450 點（不是每月）'},
+         valid:{from:'2026-07-01',to:'2026-09-30'},
+         source:'https://www.ctbcbank.com/content/twrbo/zh_tw/cc_index/cc_product/cc_introduction_index/C_LINEPay.html',
+         checkedAt:'2026-08-24'}]},
      overseas_online:{rate:1.0,note:'線上購物僅基本 1%，2.8% 加碼不適用線上消費'},
      overseas_default:{rate:1.0,note:'非面對面消費僅基本 1%'},
      tw_default:{rate:1.0},
    }},
-  {id:'ctbc_cashback',bank:'中國信託',name:'現金回饋御璽卡',
+  // ⚠️ 2026-08-24 查核：ctbcbank.com 的產品頁對自動化存取全數回 HTTP 202 反爬蟲挑戰，
+  // 試過 6 種 UA／協定／cookie 組合與 4 個路徑都拿不到內容。
+  // 下面的 2.5% 級距數字【沒有任何官網依據】，是查核前就存在的舊資料。
+  // 依「查不到就不寫」原則標記為未經核實，需人工開瀏覽器核對後才可信任。
+  {id:'ctbc_cashback',bank:'中國信託',name:'現金回饋御璽卡',unverified:true,
    color:'#CC0000',fee:1.5,rewardType:'cash',rewardLabel:'現金回饋',
    officialUrl:'https://www.ctbcbank.com/content/twrbo/zh_tw/cc_index/cc_product/cc_introduction_index/B_Cashback_Signature.html',
    defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
@@ -300,8 +345,12 @@ const CARD_DB = [
    officialUrl:'https://www.hsbc.com.tw/en-tw/credit-cards/products/cashback-signature/',
    defaultRate:1.22,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
-     overseas_physical:{rate:2.22,note:'海外實體 2.22%（⚠️ 不含歐盟/英國實體通路）'},
-     overseas_online:{rate:2.22,note:'海外線上 2.22%'},
+     // 2026-08-24 查核更正：原本 rate 仍是 2.22，只在 note 寫警語，
+     // 排序會把這張卡在英國情境推得太前面。官網把「歐盟 27 國＋英國的實體商店交易」
+     // 列在「符合資格消費」的排除項目下 —— 不是降比例，是不給。
+     overseas_physical:{rate:0,note:'⚠️ 歐盟 27 國與英國的實體商店交易被官網列為排除項目，完全不給回饋。其他地區海外實體為 2.22%',
+       source:'https://www.hsbc.com.tw/credit-cards/products/cashback-signature/',checkedAt:'2026-08-24'},
+     overseas_online:{rate:2.22,note:'海外線上 2.22%（線上交易不受歐盟／英國排除條款影響）'},
      overseas_default:{rate:2.22},
      tw_default:{rate:1.22},
    }},
@@ -364,15 +413,18 @@ const CARD_DB = [
   // ─── 聯邦銀行 ───
   {id:'ubot_laidian',bank:'聯邦銀行',name:'賴點卡',
    color:'#1FAD4E',fee:1.5,rewardType:'points',rewardLabel:'LINE POINTS',
-   officialUrl:'https://creditcards.com.tw/creditcard/ubot-line-points-credit-card/',
+   officialUrl:'https://activity.ubot.com.tw/2026LaiDianCard/index.htm',
    defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
      overseas_default:{rate:3.0,note:'海外消費 3% LINE POINTS（無上限）'},
      tw_default:{rate:1.0},
    }},
   // ─── 美國運通 ───
-  {id:'amex_gold_credit',bank:'美國運通',name:'信用金卡',
-   color:'#C9A227',fee:1.5,rewardType:'points',rewardLabel:'會員酬賓積分（可換哩程或刷卡金）',
+  // ⚠️ 2026-08-24 查核：美國運通台灣官網現行卡片清單共 7 張，查無「信用金卡」，
+  // 其專屬頁 302 轉址到總覽頁 —— 這張卡很可能已停發。兩個情境的數字都無官網依據。
+  // 依「查不到就不寫」原則標記為未經核實，不自行刪卡（由 Mark 決定是否移除）。
+  {id:'amex_gold_credit',bank:'美國運通',name:'信用金卡（疑已停發）',unverified:true,
+   color:'#C9A227',fee:2.0,rewardType:'points',rewardLabel:'會員酬賓積分（可換哩程或刷卡金）',
    officialUrl:'https://www.americanexpress.com/zh-tw/credit-cards/all-cards/',
    defaultRate:1.2,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
@@ -380,37 +432,49 @@ const CARD_DB = [
      tw_default:{rate:1.2,note:'每 NT$30=1積分，等值約 1.2%'},
    }},
   {id:'amex_plat_credit',bank:'美國運通',name:'信用白金卡',
-   color:'#9B9B9B',fee:1.5,rewardType:'points',rewardLabel:'會員酬賓積分（可換哩程或刷卡金）',
+   color:'#9B9B9B',fee:2.0,rewardType:'points',rewardLabel:'會員酬賓積分（可換哩程或刷卡金）',
    officialUrl:'https://www.americanexpress.com/zh-tw/credit-cards/grcc-plat/',
    defaultRate:1.2,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
-     overseas_default:{rate:2.0,note:'登錄後海外額外 1 積分（NT$15=1積分），等值約 2%'},
+     // 2026-08-24 查核：官網該頁全文連「海外消費」四個字都沒出現，
+     // 原本的 2.0% 與「登錄後海外額外積分」查無任何官方依據，退回一般消費率。
+     overseas_default:{rate:1.2,note:'⚠️ 官網產品頁查無任何海外加碼條款，僅一般消費 NT$30=1積分（≈1.2%）'},
      tw_dining:{rate:2.5,note:'指定 5 星餐廳買一送一或最高 5% 回饋'},
      tw_default:{rate:1.2,note:'NT$30=1積分，等值約 1.2%'},
    }},
   {id:'amex_plat_charge',bank:'美國運通',name:'簽帳白金卡',
-   color:'#A8A9AD',fee:1.5,rewardType:'points',rewardLabel:'會員酬賓積分（可換哩程或刷卡金）',
+   color:'#A8A9AD',fee:2.0,rewardType:'points',rewardLabel:'會員酬賓積分（可換哩程或刷卡金）',
    officialUrl:'https://www.americanexpress.com/zh-tw/charge-cards/plat/',
    defaultRate:1.2,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
-     overseas_default:{rate:2.0,note:'登錄後海外額外積分（NT$15=1積分），等值約 2%'},
-     overseas_hotel:{rate:2.5,note:'精選飯店額外禮遇 + 積分加碼'},
+     // 2026-08-24 查核：官網全頁唯一相關文字是「海外消費加倍禮遇於活動期間內
+     // (2022年1月1日~12月31日)…」，該活動已於兩年八個月前結束。
+     // 原資料等於拿一個過期活動在算現在的回饋。
+     overseas_default:{rate:1.2,note:'⚠️ 官網的「海外消費加倍禮遇」活動期間為 2022/1/1~12/31，已結束。目前僅一般消費 NT$30=1積分（≈1.2%）'},
+     overseas_hotel:{rate:1.2,note:'⚠️ 精選飯店禮遇為住房權益（升等、早餐等），非積分加碼，回饋仍為一般 1.2%'},
      tw_default:{rate:1.2},
    }},
   {id:'amex_eva_gold',bank:'美國運通',name:'長榮航空簽帳金卡',
-   color:'#006747',fee:1.5,rewardType:'points',rewardLabel:'長榮無限哩程（1哩≈NT$0.5）',
-   officialUrl:'https://www.americanexpress.com/zh-tw/charge-cards/grcc-eva-gold/',
-   defaultRate:1.2,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
+   color:'#006747',fee:2.0,rewardType:'points',rewardLabel:'長榮無限哩程（1哩≈NT$0.5）',
+   officialUrl:'https://www.americanexpress.com/zh-tw/charge-cards/eva-gold/',
+   source:'https://www.americanexpress.com/zh-tw/charge-cards/eva-gold/',checkedAt:'2026-08-24',
+   // 2026-08-24 查核大修：原 officialUrl（grcc-eva-gold）實測 404，六個情境全錯。
+   // 官網真實規則：基本 NT$25=1哩；國內每月首 2,000 哩 NT$20=1哩；
+   // 海外與長榮機票每月首 2,000 哩 NT$15=1哩，超過 2,000 哩退回 NT$25=1哩。
+   // 原資料的 NT$30（國內）與 NT$20（海外）在官網一個字都找不到，
+   // 而且完全沒有「每月 2,000 哩」這個上限。1哩≈NT$0.5 換算。
+   defaultRate:2.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
-     overseas_default:{rate:1.5,note:'海外消費 NT$20=1哩，等值約 1.5%'},
-     overseas_flight:{rate:1.5,note:'一般航空 NT$20=1哩（非長榮）'},
-     overseas_flight_eva:{rate:2.0,note:'長榮航空購票 NT$15=1哩，等值約 2%'},
-     tw_default:{rate:1.2,note:'NT$30=1哩，等值約 1.2%'},
-     tw_flight:{rate:1.2,note:'台灣購票（非長榮）NT$30=1哩'},
-     tw_flight_eva:{rate:2.0,note:'台灣購買長榮機票 NT$15=1哩，等值約 2%（無海外手續費）'},
+     overseas_default:{rate:3.33,note:'海外每月首 2,000 哩 NT$15=1哩（≈3.33%），超過 2,000 哩退回 NT$25=1哩（≈2%）'},
+     overseas_flight:{rate:3.33,note:'非長榮航空購票比照海外消費，每月首 2,000 哩 NT$15=1哩（≈3.33%），超過退回 NT$25=1哩'},
+     overseas_flight_eva:{rate:3.33,note:'長榮航空購票每月首 2,000 哩 NT$15=1哩（≈3.33%），超過 2,000 哩退回 NT$25=1哩'},
+     tw_default:{rate:2.5,note:'國內每月首 2,000 哩 NT$20=1哩（≈2.5%），超過 2,000 哩退回基本 NT$25=1哩（≈2%）'},
+     tw_flight:{rate:2.5,note:'台灣購票（非長榮）比照國內消費，每月首 2,000 哩 NT$20=1哩'},
+     tw_flight_eva:{rate:3.33,note:'台灣購買長榮機票每月首 2,000 哩 NT$15=1哩（≈3.33%），無海外手續費'},
    }},
-  {id:'amex_green_charge',bank:'美國運通',name:'簽帳綠卡',
-   color:'#2D8A4E',fee:1.5,rewardType:'points',rewardLabel:'會員酬賓積分（可換哩程或刷卡金）',
+  // 2026-08-24 查核：官網已將「簽帳綠卡」更名為「美國運通簽帳卡」。
+  {id:'amex_green_charge',bank:'美國運通',name:'美國運通簽帳卡（原簽帳綠卡）',
+   color:'#2D8A4E',fee:2.0,rewardType:'points',rewardLabel:'會員酬賓積分（可換哩程或刷卡金）',
    officialUrl:'https://www.americanexpress.com/zh-tw/charge-cards/green/',
    defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
@@ -429,10 +493,28 @@ const CARD_DB = [
   // ─── 台北富邦 ───
   {id:'fubon_j',bank:'台北富邦',name:'J 卡',
    color:'#E60012',fee:1.5,rewardType:'cash',rewardLabel:'刷卡金（現金回饋）',
-   officialUrl:'https://creditcards.com.tw/creditcard/fubon-j-japan-korea-midnight-credit-card-cashback/',
+   officialUrl:'https://www.fubon.com/banking/Personal/credit_card/all_card/omiyage/omiyage.htm',
+   source:'https://www.fubon.com/banking/Personal/credit_card/all_card/omiyage/omiyage.htm',checkedAt:'2026-08-24',
    defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
-     overseas_physical:{rate:1.0,reg:true,note:'⚠️ 6% 僅限日本/韓國/泰國等指定亞洲國家，英/歐/北美實體僅基本 1%',regNote:'⚠️ 每月 20 日 16:00 開放搶登錄（每月限量 20,000 名，搶完即止）；登錄成功後本季（Q2: 4–6 月、Q3: 7–9 月）皆有效，不需每月重複登錄（每季總額 60,000 名）；登錄頁：cardpromote.taipeifubon.com.tw/promotion/Detail?sn=C000307 或 Fubon+ App；日韓泰實體 6%，單筆滿 NT$1,000，每季加碼上限 NT$1,000；⚠️ 需設富邦銀行自動扣繳或申請電子帳單才可享回饋（活動至 2026/09/30）'},
+     // 2026-08-24 查核更正：原本寫「英/歐/北美實體僅基本 1%」是錯的。
+     // 官網「一般消費定義」把「歐洲經濟區實體商店交易」整段排除，註 2 的國家清單明文含英國。
+     // 不是降率，是根本不算一般消費 —— 對住倫敦的人這格是 0，不是 1%。
+     overseas_physical:{rate:0,note:'⚠️ 英國與歐洲經濟區的實體商店交易被官網排除在「一般消費」定義外，完全不給回饋（線上消費不受影響）。6% 僅限日本／韓國／泰國等指定亞洲國家',
+       source:'https://www.fubon.com/banking/Personal/credit_card/all_card/omiyage/omiyage.htm',checkedAt:'2026-08-24',
+       boosts:[{
+         id:'fubon-j-asia-6pct',
+         label:'日韓泰實體 6%（季度搶登錄）',
+         rate:6.0, baseRate:0,
+         channel:'限日本、韓國、泰國等指定亞洲國家的實體商店，單筆須滿 NT$1,000。英國與歐洲經濟區不適用',
+         reg:{period:'quarter', opensDom:20,
+              url:'https://cardpromote.taipeifubon.com.tw/promotion/Detail?sn=C000307',
+              note:'每月 20 日 16:00 開放搶登錄，登錄成功後整季有效（Q3 為 7–9 月），不需每月重複登錄。另需設富邦銀行自動扣繳或申請電子帳單',
+              quota:'每月限量 20,000 名、每季總額 60,000 名，搶完即止'},
+         cap:{amt:1000,per:'quarter'},
+         valid:{from:'2026-01-01',to:'2026-09-30'},
+         source:'https://cardpromote.taipeifubon.com.tw/promotion/Detail?sn=C000307',
+         checkedAt:'2026-08-24'}]},
      overseas_flight:{rate:3.0,note:'日韓航空購票 3%（含廉航 Peach/Jetstar/Jeju Air 等）'},
      overseas_flight_budget:{rate:3.0,note:'日韓廉航購票 3%（Peach、Jetstar Japan、濟州航空等）'},
      overseas_hotel:{rate:1.0},
@@ -470,10 +552,28 @@ const CARD_DB = [
   // ─── 第一銀行 ───
   {id:'fcb_wonderful',bank:'第一銀行',name:'Wonderful 星璨卡',
    color:'#004B87',fee:1.5,rewardType:'cash',rewardLabel:'現金回饋',
-   officialUrl:'https://card.firstbank.com.tw/',
+   officialUrl:'https://card.firstbank.com.tw/sites/card/zh_TW/1565709749406',
+   source:'https://card.firstbank.com.tw/sites/card/zh_TW/1565709749406',checkedAt:'2026-08-24',
    defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
-     overseas_physical:{rate:3.5,note:'海外實體/日韓 3.5%（需設電子帳單+自動扣繳），無上限'},
+     // 2026-08-24 查核更正三處：①原本標「無上限」，官網為每戶每月上限 300 元
+     // ②原本寫「需電子帳單+自動扣繳」，官網是兩者擇一 ③原 note 的「日韓 3.5%」
+     // 是一卡通聯名卡的活動，掛錯卡了。另與 J 卡相同，英國實體被排除。
+     overseas_physical:{rate:0,note:'⚠️ 英國實體商店交易被官網排除在符合資格消費外，不給回饋。海外 3.5% 加碼不適用於英國',
+       source:'https://card.firstbank.com.tw/sites/card/zh_TW/1565709749406',checkedAt:'2026-08-24',
+       boosts:[{
+         id:'fcb-wonderful-oversea-35',
+         label:'海外精選通路 3.5%（搶登錄）',
+         rate:3.5, baseRate:0,
+         channel:'限官網指定海外通路，且排除英國等地區',
+         reg:{period:'month',
+              url:'https://card.firstbank.com.tw/sites/card/zh_TW/1565709749406',
+              note:'需登錄，並設定電子帳單「或」帳戶自動扣繳（兩者擇一即可，非兩者皆需）',
+              quota:'登錄限量 20,000 名'},
+         cap:{amt:300,per:'month'},
+         valid:{from:'2026-01-01',to:'2026-12-31'},
+         source:'https://card.firstbank.com.tw/sites/card/zh_TW/1565709749406',
+         checkedAt:'2026-08-24'}]},
      overseas_default:{rate:1.0},
      tw_default:{rate:1.5,note:'指定通路 1.5%'},
    }},
@@ -483,124 +583,22 @@ const CARD_DB = [
    officialUrl:'https://wise.com/tw/',isRevolut:true,
    defaultRate:0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{},
-   note:'Wise 使用中間市場匯率，海外消費幾乎無附加費。台灣目前無法直接申辦卡片，需海外地址。'},
+   note:'⚠️ Wise 匯率確實零加價，但只有「帳上已持有該幣別」時才真的免費；需要換匯時英國區收費 from 0.24%。台灣目前無法直接申辦卡片，需海外地址。',
+   source:'https://wise.com/gb/pricing/card-fees',checkedAt:'2026-08-24'},
 ];
 
-/* ============================
-   DEFAULT CARDS (verified 2026/07)
-   ============================ */
-const DC = [
-  // ── eco 永續卡 ──────────────────────
-  {id:'eco',bank:'星展銀行',name:'eco 永續卡',color:'#DA1710',
-   fee:1.5,owned:true,rewardType:'cash',rewardLabel:'現金積點',
-   officialUrl:'https://www.dbs.com.tw/personal-zh/cards/dbs_eco/index.html',
-   defaultRate:1.0,
-   capKey:'overseas_physical', capAmt:600, capBonusOnly:true, capBonusPct:4, capBaseRate:1.0,
-   source:'https://www.dbs.com.tw/personal-zh/cards/dbs_eco/index.html', checkedAt:'2026-08-24',
-   overrides:{
-     overseas_physical:{rate:5.0,note:'英/歐/日/韓/新/泰/美洲 實體消費，回饋上限 NT$600/期（4%加碼），超過後僅 1%'},
-     overseas_online:{rate:1.0,note:'線上購物不適用 5%，僅基本 1%'},
-     overseas_subscription:{rate:1.0,note:'訂閱不適用 5%'},
-     overseas_apple:{rate:1.0,note:'Apple 線上不適用 5%'},
-     overseas_insurance:{rate:1.0},
-     overseas_flight:{rate:1.0,note:'線上訂票不適用 5%（如為機場實體購票則適用）'},
-     overseas_hotel:{rate:1.0,note:'線上訂房不適用 5%（⭐ 季度旅遊加碼活動：Agoda/Booking.com 訂房達門檻可+3%，需在 Card+ App 登錄，2026/5–8/31）'},
-     tw_default:{rate:1.0},
-   }},
-  // ── Richart ─────────────────────────
-  {id:'richart',bank:'台新銀行',name:'Richart 卡',color:'#E8001D',
-   fee:1.5,owned:true,rewardType:'points',rewardLabel:'台新Point（可折抵帳單）',
-   officialUrl:'https://www.taishinbank.com.tw/TSB/personal/credit/intro/overview/cg047/card001/',
-   defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
-   overrides:{
-     overseas_physical:{rate:3.3,note:'切換「玩旅刷」3.3%（L1/L2 皆適用，無需設自扣即可享回饋；⚠️ 只有「Pay著刷」方案才有 L1/L2 差異）（活動至 2027/03）'},
-     overseas_online:{rate:3.3,note:'切換「玩旅刷」或「數趣刷」3.3%（L1/L2 皆適用）（活動至 2027/03）'},
-     overseas_subscription:{rate:3.3,note:'切換「數趣刷」（L1/L2 皆適用）（活動至 2027/03）'},
-     overseas_apple:{rate:3.3,note:'切換「數趣刷」（L1/L2 皆適用）（活動至 2027/03）'},
-     overseas_insurance:{rate:1.3,note:'保費 1.3%，無上限（免切換方案，L1/L2 皆可）'},
-     overseas_flight:{rate:3.3,note:'切換「玩旅刷」（L1/L2 皆適用）（活動至 2027/03）'},
-     overseas_hotel:{rate:3.3,note:'切換「玩旅刷」（L1/L2 皆適用）（活動至 2027/03）；⭐ 可疊加台新訂房折扣：Agoda（agoda.com/zh-tw/taishinpromo，8% off）、Hotels.com（碼 TSBH）、Expedia（碼 RICHART10，10%）、Booking.com（需從台新官方活動頁進入）—均需從台新官方活動頁進入才有效'},
-     overseas_default:{rate:3.3,note:'切換「玩旅刷」（L1/L2 皆適用）（活動至 2027/03）'},
-     tw_cvs:{rate:3.8,note:'切換「Pay著刷」，使用台新Pay（四大超商適用）；LINE Pay 最高 2.3%（L2）（活動至 2027/03）'},
-     tw_dining:{rate:3.3,note:'切換「好饗刷」'},
-     tw_digital:{rate:3.3,note:'切換「數趣刷」；Klook 需從台新專屬頁進入才有額外折扣：klook.com/zh-TW/tetris/promo/taishinbank/'},
-     tw_shopee:{rate:3.3,note:'切換「數趣刷」'},
-     tw_costco:{rate:3.3,note:'切換「天天刷」或「大筆刷」'},
-     tw_insurance:{rate:1.3,note:'保費 1.3%，無需切換'},
-     tw_default:{rate:3.3,note:'依類型切換對應方案'},
-   }},
-  // ── CUBE L2 ─────────────────────────
-  {id:'cube',bank:'國泰世華',name:'CUBE 卡 Level 2',color:'#003087',
-   fee:1.5,owned:true,rewardType:'points',rewardLabel:'小樹點（可折抵帳單）',
-   officialUrl:'https://www.money101.com.tw/blog/%E5%9C%8B%E6%B3%B0%E4%B8%96%E8%8F%AFcube%E5%8D%A1',
-   defaultRate:0.5,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
-   overrides:{
-     overseas_physical:{rate:3.0,reg:true,regNote:'每次消費前在 CUBE App 切換「趣旅行」（App 首頁 > CUBE 卡權益方案 > 趣旅行），每日限切一次；未切換無旅遊加碼'},
-     overseas_flight:{rate:3.0,reg:true,regNote:'CUBE App 切換「趣旅行」，航空公司 3%（含廉航），每日限切一次'},
-     overseas_flight_budget:{rate:3.0,reg:true,regNote:'CUBE App 切換「趣旅行」，廉航 3%，每日限切一次'},
-     overseas_hotel:{rate:3.0,reg:true,regNote:'CUBE App 切換「趣旅行」，Agoda/Booking.com/Hotels.com 3%，每日限切一次'},
-     overseas_online:{rate:1.0,note:'線上購物趣旅行不適用，回 1%'},
-     overseas_subscription:{rate:1.0},
-     overseas_apple:{rate:1.0,note:'Apple 線上不適用趣旅行'},
-     overseas_insurance:{rate:1.0},
-     overseas_default:{rate:1.0},
-     tw_costco:{rate:3.0,reg:true,regNote:'CUBE App 設定「好市多」類別，3% 無上限'},
-     tw_shopee:{rate:3.0,reg:true,regNote:'CUBE App 設定「蝦皮購物」類別，3% 無上限'},
-     tw_dining:{rate:3.0,reg:true,regNote:'CUBE App 設定「樂饗購」類別（餐廳），3% 無上限'},
-     tw_digital:{rate:3.0,reg:true,regNote:'CUBE App 設定「玩數位」類別（Apple、Klook、KKday 等），3% 無上限'},
-     tw_cvs:{rate:3.0,reg:true,regNote:'CUBE App 設定對應類別，最多選 3 類'},
-     tw_default:{rate:0.5},
-   }},
-  // ── 蝦皮聯名卡 ──────────────────────
-  {id:'shopee',bank:'國泰世華',name:'蝦皮購物聯名卡',color:'#EE4D2D',
-   fee:0,owned:true,rewardType:'restricted',rewardLabel:'蝦幣（限蝦皮使用）',
-   officialUrl:'https://help.shopee.tw/portal/4/article/80312',
-   defaultRate:0.5,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
-   overrides:{
-     tw_shopee:{rate:2.0,note:'蝦皮站內消費最高 2% 蝦幣'},
-     tw_cvs:{rate:2.0},
-     overseas_physical:{rate:0.5,note:'0.5% 蝦幣 + 免手續費（蝦幣僅能用於蝦皮）'},
-     overseas_online:{rate:0.5,note:'蝦幣 + 免手續費'},
-     overseas_default:{rate:0.5},
-     tw_default:{rate:0.5},
-   }},
-  // ── Costco 富邦 ──────────────────────
-  {id:'costco',bank:'富邦銀行',name:'Costco 聯名卡',color:'#005DAA',
-   fee:1.5,owned:true,rewardType:'restricted',rewardLabel:'好多金（限 Costco 折抵）',
-   officialUrl:'https://creditcards.com.tw/creditcard/fubon-costco-credit-card/',
-   defaultRate:1.0,
-   capKey:'overseas_physical',capAmt:600,capBonusOnly:true,capBonusPct:4,capBaseRate:1.0,
-   overrides:{
-     tw_costco:{rate:2.0,note:'Costco 賣場 2%（線上 3%）好多金，只能折抵 Costco 消費'},
-     overseas_physical:{rate:5.0,note:'海外實體 5%（⚠️ 每月 1 日 00:00 搶登錄，限量 50,000 名；登錄頁：cardpromote.taipeifubon.com.tw/promotion/Detail?sn=C000270 或 Fubon+ App；搶不到僅 1%；好多金只能折抵 Costco），回饋上限 NT$600/期（活動至 2026/12/31）'},
-     tw_default:{rate:1.0},
-     overseas_default:{rate:1.0},
-   }},
-  // ── 將將卡 ──────────────────────────
-  {id:'jiangjiang',bank:'將來銀行',name:'將將卡',color:'#00C1B2',
-   fee:1.5,owned:true,rewardType:'points',rewardLabel:'N點（可折抵帳單）',
-   officialUrl:'https://www.nextbank.com.tw/product/point',
-   defaultRate:1.5,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
-   overrides:{
-     tw_default:{rate:1.5,note:'一般消費 1.5%，以官網最新公告為準'},
-     overseas_physical:{rate:1.5,note:'海外可能有促銷加碼，請至官網確認'},
-     overseas_default:{rate:1.5},
-   }},
-  // ── Mercedes 御璽卡 ──────────────────
-  {id:'mercedes',bank:'台新銀行',name:'Mercedes-Benz 御璽卡',color:'#1a1a2e',
-   fee:1.5,owned:true,rewardType:'points',rewardLabel:'台新Point（Mercedes 積點）',
-   officialUrl:'https://www.taishinbank.com.tw/TSB/personal/credit/intro/overview/cg006/card002/',
-   defaultRate:0.3,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
-   overrides:{
-     overseas_physical:{rate:0.6,note:'海外 2倍點 = 0.6%，扣手續費後淨 -0.9%，⚠️ 不建議海外使用'},
-     overseas_default:{rate:0.6},
-     tw_default:{rate:0.3,note:'一般消費 1倍點 = 0.3%'},
-   }},
-  // ── Revolut ─────────────────────────
-  {id:'revolut',bank:'Revolut',name:'Revolut 簽帳卡',color:'#0075EB',
-   fee:0,owned:true,rewardType:'cash',rewardLabel:'直接英鎊消費',
-   officialUrl:'https://www.revolut.com/en-GB/',
-   defaultRate:0,isRevolut:true,
-   capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
-   overrides:{}},
-];
+/* ============================================================
+   DEFAULT CARDS（使用者預設持有的卡）
+   ============================================================
+   2026-08-24 改為【從 CARD_DB 衍生】，不再手抄一份。
+
+   為什麼：原本 DC 是 CARD_DB 的複本，同一張卡的 rate / capAmt / note
+   要改兩個地方。今天就踩到兩次 —— eco 的 capAmt 差 200、richart 與 cube
+   的 defaultRate 一邊改了一邊沒改，使用者會看到「搜尋顯示 A、加入後變 B」。
+   衍生之後這類 bug 從結構上消失，改一次就好。
+   ============================================================ */
+const DC_OWNED = ['eco','richart','cube','shopee','costco','jiangjiang','mercedes','revolut'];
+const DC = DC_OWNED
+  .map(id => CARD_DB.find(c => c.id === id))
+  .filter(Boolean)
+  .map(c => ({...c, owned:true}));
