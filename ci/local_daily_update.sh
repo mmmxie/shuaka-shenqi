@@ -149,7 +149,12 @@ if git diff --quiet -- "$DATA_FILE"; then
   echo "無變更"
   write_status "✅ 成功（無變動）" "資料已是最新，沒有需要修改的地方"
 else
-  git add "$DATA_FILE"
+  # 資料變了就一定要 bump index.html 裡的 ?v=，否則使用者瀏覽器會繼續用快取的舊
+  # cards.js，這次更新對他們等於沒發生。
+  VER=$(date '+%Y%m%d')
+  sed -i '' "s|data/cards\.js?v=[0-9]*|data/cards.js?v=${VER}|" index.html
+  echo "已將 cards.js 版本號更新為 ${VER}"
+  git add "$DATA_FILE" index.html
   git commit -q -m "每日自動更新 $TODAY"
   if git push origin main; then
     echo "已更新並推送"

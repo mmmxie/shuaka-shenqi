@@ -624,7 +624,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","
 
 <!-- 卡片資料。必須在主 script 之前載入：CARD_DB / DC 定義在裡面。
      用 <script src> 而非 fetch()，這樣 file:// 直接開也能用（不受 CORS 限制）。 -->
-<script src="data/cards.js"></script>
+<!-- ?v= 是快取破壞用的，每日核查改動資料後會自動更新成當天日期。
+     沒有它，使用者的瀏覽器會一直拿舊的 cards.js，自動更新等於白做。 -->
+<script src="data/cards.js?v=20260824"></script>
 
 <script>
 /* ============================
@@ -919,7 +921,7 @@ function go(id){
 // 設定頁上的「還有幾個沒登錄」小標記
 function updateRegBadge(){
   const el=document.getElementById('reg-count-badge'); if(!el)return;
-  const n=allBoosts(new Date()).filter(x=>x.state==='needReg').length;
+  const n=new Set(allBoosts(new Date()).filter(x=>x.state==='needReg').map(x=>x.boost.id)).size;
   el.textContent=n?`${n} 個未登錄`:'✅ 都完成了';
   el.style.color=n?'#b45309':'#15803d';
 }
@@ -930,7 +932,11 @@ function updateRegBadge(){
 function renderRegPage(){
   const el=document.getElementById('reg-list'); if(!el)return;
   const now=new Date();
-  const items=allBoosts(now).filter(x=>x.boost.reg);
+  // 同一個 boost id 會掛在多個情境上（例：台新 L2 有 11 格），
+  // 但它對使用者是「同一件要做的事」，所以清單依 id 去重，只列一次。
+  const seen=new Set();
+  const items=allBoosts(now).filter(x=>x.boost.reg)
+    .filter(x=>{ if(seen.has(x.boost.id))return false; seen.add(x.boost.id); return true; });
   if(!items.length){
     el.innerHTML=`<div class="emp"><div class="empi">✅</div>
       <div style="font-size:14px">目前沒有需要登錄的活動</div></div>`;
@@ -949,8 +955,11 @@ function renderRegPage(){
           <div style="font-weight:700;font-size:13.5px">${sEsc(x.card.name)}
             <span style="font-weight:400;color:#6b7280">${sEsc(b.label)}</span></div>
           <div style="font-size:11.5px;color:#6b7280;margin-top:3px;line-height:1.6">
-            ${PERIOD_L[b.reg.period]||b.reg.period}登錄　·　${sEsc(rkLabel(x.rk))}　·
-            未登錄 ${b.baseRate.toFixed(1)}% → 登錄後 ${b.maxOnly?'最高 ':''}${b.rate.toFixed(1)}%
+            ${PERIOD_L[b.reg.period]||b.reg.period}登錄　·　${sEsc(rkLabel(x.rk))}
+            ${b.isFixedReward
+              ? ''   // 定額刷卡金不是比例回饋，寫「1.0% → 1.0%」只會讓人困惑
+              : `　·　未登錄 ${b.baseRate.toFixed(1)}% → 登錄後 ${b.maxOnly?'最高 ':''}${b.rate.toFixed(1)}%`}
+            ${b.threshold?`<br>💰 ${sEsc(b.threshold)}`:''}
             ${b.reg.note?`<br>${sEsc(b.reg.note)}`:''}
             ${b.reg.quota?`<br><span style="color:#b45309">⚠️ ${sEsc(b.reg.quota)}</span>`:''}
           </div>
@@ -1136,7 +1145,10 @@ function renderToday(){
   const el=document.getElementById('today-board'); if(!el)return;
   const now=new Date();
   const all=allBoosts(now);
-  const needReg=all.filter(x=>x.state==='needReg');
+  // 看板同樣依 boost id 去重，否則台新 L2 會刷出 11 列一樣的東西
+  const seenB=new Set();
+  const needReg=all.filter(x=>x.state==='needReg')
+    .filter(x=>{ if(seenB.has(x.boost.id))return false; seenB.add(x.boost.id); return true; });
   const active =all.filter(x=>x.state==='active'&&x.boost.when);   // 有時間條件且今天正好命中，才值得提醒
   const soon   =all.filter(x=>x.state==='notToday'&&x.nextDate)
                    .filter(x=>(x.nextDate-now)/86400000<=14)
