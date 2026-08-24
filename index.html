@@ -264,7 +264,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","
 <header class="hdr">
   <div class="hdr-logo">💳 刷<em>卡</em>神器</div>
   <div style="display:flex;align-items:center;gap:10px">
-    <span style="font-size:11px;opacity:.5">資料截至 2026/06</span>
+    <span style="font-size:11px;opacity:.5">資料截至 2026/07</span>
     <a href="https://github.com/mmmxie/shuaka-shenqi" target="_blank" style="font-size:11px;opacity:.5;color:inherit;text-decoration:none">GitHub</a>
   </div>
 </header>
@@ -352,7 +352,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","
     <button class="schip" onclick="quickSearch('日本')">🇯🇵 日本</button>
   </div>
   <div id="res"></div>
-  <div class="fn">回饋率以各銀行官網最新公告為準 · 2026/06</div>
+  <div class="fn">回饋率以各銀行官網最新公告為準 · 2026/07</div>
 </div>
 
 <!-- MY CARDS -->
@@ -399,7 +399,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","
       <div class="srs">
         台灣信用卡海外消費通常收 <strong>1.5%</strong> 外幣手續費，已自動扣除。<br>
         例外：<strong>蝦皮聯名卡免手續費</strong>，<strong>Revolut 無手續費且無回饋</strong>。<br><br>
-        <strong>eco 月回饋上限</strong>：4% 加碼上限 NT$600／月，約消費 NT$15,000 達頂。
+        <strong>eco 月回饋上限</strong>：4% 加碼上限 NT$800／月，約消費 NT$20,000 達頂。
         超過後仍有 1% 基本，但扣 1.5% 手續費後為 -0.5%，此時改用 Richart 玩旅刷（1.8% 淨）。
       </div>
     </div>
@@ -472,7 +472,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","
     </button>
     <div class="sep"></div>
     <div style="font-size:12px;color:var(--sub);margin-bottom:8px">
-      <strong>特殊上限設定</strong>（如 eco 的 4% 加碼 NT$600 月上限）：
+      <strong>特殊上限設定</strong>（如 eco 的 4% 加碼 NT$800 月上限）：
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <div style="flex:1;min-width:140px">
@@ -633,7 +633,7 @@ const RKEYS = [
 function rkLabel(k){ return (RKEYS.find(x=>x.k===k)||{l:k}).l; }
 
 /* ============================
-   CARD DATABASE (verified 2026/05)
+   CARD DATABASE (verified 2026/07)
    新增卡片時從此選取，資料自動帶入
    ============================ */
 const CARD_DB = [
@@ -643,14 +643,14 @@ const CARD_DB = [
    officialUrl:'https://www.taishinbank.com.tw/TSB/personal/credit/intro/overview/cg047/card001/',
    defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
-     overseas_physical:{rate:3.3,note:'切換「玩旅刷」3.3%（⚠️ 需設定台新帳戶自動扣款才有 L2；無自扣帳戶僅 L1 1.3%）'},
-     overseas_online:{rate:3.3,note:'切換「玩旅刷」或「數趣刷」（⚠️ 需 L2，須設台新帳戶自扣；無自扣僅 1.3%）'},
-     overseas_subscription:{rate:3.3,note:'切換「數趣刷」方案（需 L2，須設台新帳戶自扣）'},
-     overseas_apple:{rate:3.3,note:'切換「數趣刷」方案（需 L2，須設台新帳戶自扣）'},
-     overseas_insurance:{rate:1.3,note:'保費 1.3%（需 L2；無自扣帳戶約 0.3-1%）'},
-     overseas_flight:{rate:3.3,note:'切換「玩旅刷」方案（需 L2，須設台新帳戶自扣）'},
-     overseas_hotel:{rate:3.3,note:'切換「玩旅刷」方案（需 L2，須設台新帳戶自扣）'},
-     overseas_default:{rate:3.3,note:'切換「玩旅刷」方案（需 L2，須設台新帳戶自扣）'},
+     overseas_physical:{rate:3.3,note:'切換「玩旅刷」3.3%（L1/L2 皆適用，無需設自扣即可享回饋；⚠️ 只有「Pay著刷」方案才有 L1/L2 差異）（活動至 2027/03）'},
+     overseas_online:{rate:3.3,note:'切換「玩旅刷」或「數趣刷」3.3%（L1/L2 皆適用）（活動至 2027/03）'},
+     overseas_subscription:{rate:3.3,note:'切換「數趣刷」方案（L1/L2 皆適用）（活動至 2027/03）'},
+     overseas_apple:{rate:3.3,note:'切換「數趣刷」方案（L1/L2 皆適用）（活動至 2027/03）'},
+     overseas_insurance:{rate:1.3,note:'保費 1.3%，無上限（免切換方案，L1/L2 皆可）'},
+     overseas_flight:{rate:3.3,note:'切換「玩旅刷」方案（L1/L2 皆適用）（活動至 2027/03）'},
+     overseas_hotel:{rate:3.3,note:'切換「玩旅刷」方案（L1/L2 皆適用）（活動至 2027/03）'},
+     overseas_default:{rate:3.3,note:'切換「玩旅刷」方案（L1/L2 皆適用）（活動至 2027/03）'},
      tw_cvs:{rate:3.8,note:'切換「Pay著刷」，使用台新 Pay（四大超商適用，無單筆金額限制）；LINE Pay 最高 2.3%（L2）（活動至 2027/03）'},
      tw_dining:{rate:3.3,note:'切換「好饗刷」方案'},
      tw_digital:{rate:3.3,note:'切換「數趣刷」方案'},
@@ -739,13 +739,13 @@ const CARD_DB = [
   {id:'sinopac_dual',bank:'永豐銀行',name:'幣倍卡',
    color:'#00AEEF',fee:1.5,rewardType:'cash',rewardLabel:'現金回饋（直接折抵）',
    officialUrl:'https://bank.sinopac.com/sinopacBT/personal/credit-card/introduction/bankcard/dual-currency-card.html',
-   defaultRate:2.0,capKey:'overseas_physical',capAmt:300,capBonusOnly:true,capBonusPct:4,capBaseRate:2.0,
+   defaultRate:2.0,capKey:'overseas_physical',capAmt:800,capBonusOnly:true,capBonusPct:4,capBaseRate:2.0,
    overrides:{
-     overseas_physical:{rate:6.0,note:'精選通路 2%+4%=6%（實體：一般海外實體商店；⚠️ 回饋上限 NT$300/期（L1），NT$800/期（L2））'},
-     overseas_online:{rate:6.0,note:'精選網購通路 6%：Amazon、Rakuten、Mercari、eBay、iHerb、Selfridge、Gmarket、Olive Young、淘寶、SUICA/PASMO/ICOCA 儲值、大國藥妝、Sugi藥妝、Klook、KKDAY、Booking.com、Agoda、Airbnb、Expedia、Trip.com、Trivago、AsiaYo（活動至 2026/06/30）等；回饋上限 NT$300/期（L1）'},
-     overseas_flight:{rate:6.0,note:'航空公司購票 6%（L1，回饋上限 NT$300/期）'},
-     overseas_flight_budget:{rate:6.0,note:'廉航購票 6%（L1，回饋上限 NT$300/期）'},
-     overseas_hotel:{rate:6.0,note:'Booking.com/Agoda/Airbnb/AsiaYo（活動至 2026/06/30）等 6%（L1，回饋上限 NT$300/期）'},
+     overseas_physical:{rate:6.0,note:'精選通路 2%+4%=6%（實體：一般海外實體商店；⚠️ 回饋上限 NT$800/期；需設永豐台外幣帳戶自扣+電子帳單，且往來資產月均≥NT$10萬或大戶/大戶Plus等級；2026/07 起僅剩單一等級）（活動至 2026/12/31）'},
+     overseas_online:{rate:6.0,note:'精選網購通路 6%：Amazon、Rakuten、Mercari、eBay、iHerb、Selfridge、Gmarket、Olive Young、淘寶、SUICA/PASMO/ICOCA 儲值、大國藥妝、Sugi藥妝、Klook、KKDAY、Booking.com、Agoda、Airbnb、Expedia、Trip.com、Trivago 等；回饋上限 NT$800/期；需往來資產月均≥NT$10萬或大戶等級（活動至 2026/12/31）'},
+     overseas_flight:{rate:6.0,note:'航空公司購票 6%（回饋上限 NT$800/期；需往來資產月均≥NT$10萬或大戶等級）（活動至 2026/12/31）'},
+     overseas_flight_budget:{rate:6.0,note:'廉航購票 6%（回饋上限 NT$800/期；需往來資產月均≥NT$10萬或大戶等級）（活動至 2026/12/31）'},
+     overseas_hotel:{rate:6.0,note:'Booking.com/Agoda/Airbnb 等 6%（回饋上限 NT$800/期；需往來資產月均≥NT$10萬或大戶等級）（活動至 2026/12/31）'},
      overseas_default:{rate:2.0,note:'非精選通路海外消費 2%，無上限'},
      tw_default:{rate:1.0,note:'國內一般消費 1%'},
    }},
@@ -793,17 +793,17 @@ const CARD_DB = [
    officialUrl:'https://www.esunbank.com/en/personal/credit-card/intro/bank-card/u-bear',
    defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
-     overseas_subscription:{rate:10.0,note:'指定數位訂閱（Netflix、ChatGPT、Gemini、Steam、Nintendo、PlayStation、Google One、Google Services）最高 10%，每期回饋上限 NT$100（⚠️ Spotify 不在清單；⚠️ 需設電子帳單+玉山帳戶自扣，未設定回饋為 0%）（活動至 2026/08/31）'},
-     overseas_online:{rate:3.0,note:'指定海外網購通路 3%（基本 1%+加碼 2%），加碼每期上限 NT$150（⚠️ 需設電子帳單+玉山帳戶自扣，未設定回饋為 0%）（活動至 2026/08/31）'},
-     overseas_default:{rate:1.0,note:'一般海外 1%（⚠️ 同樣需設電子帳單+自扣）'},
-     tw_default:{rate:1.0,note:'基本 1%（⚠️ 需設電子帳單+玉山帳戶自扣，未設定回饋為 0%）'},
+     overseas_subscription:{rate:10.0,note:'指定數位訂閱（Netflix、ChatGPT、Gemini、Steam、Nintendo、PlayStation、Google One、Google Services）最高 10%，每期回饋上限 NT$100（⚠️ Spotify 不在清單；此加碼無需設電子帳單/自扣即可享回饋）（活動至 2026/08/31）'},
+     overseas_online:{rate:3.0,note:'指定海外網購通路 3%（基本 1%+加碼 2%），加碼每期上限 NT$150（⚠️ 需同時設電子帳單+玉山帳戶自扣並成功扣繳才有基本 1%；僅設一項則基本 0.5%）（活動至 2026/08/31）'},
+     overseas_default:{rate:1.0,note:'一般海外 1%（⚠️ 需同時設電子帳單+玉山帳戶自扣並成功扣繳；僅設一項則 0.5%；未設則 0%）'},
+     tw_default:{rate:1.0,note:'基本 1%（⚠️ 需同時設電子帳單+玉山帳戶自扣並成功扣繳；僅設一項則 0.5%；未設則 0%）'},
    }},
   {id:'esun_unicard',bank:'玉山銀行',name:'Unicard（UP 選）',
    color:'#B8860B',fee:1.5,rewardType:'points',rewardLabel:'玉山 e point（1 點 = NT$1 可折抵帳單）',
    officialUrl:'https://www.esunbank.com/zh-tw/personal/credit-card/intro/bank-card/unicard',
    defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
-     overseas_physical:{rate:3.5,reg:true,regNote:'UP 選加碼 3.5%（⚠️ 英/歐洲 28 國實體消費無基礎 1%，整體僅 3.5%；非百大特店門市無任何回饋）；月上限 5,000 點；需訂閱 UP 選（149 e point/月，或達免費任務）（活動至 2026/06/30）'},
+     overseas_physical:{rate:3.5,reg:true,regNote:'UP 選加碼 3.5%（⚠️ 英/歐洲 28 國實體消費無基礎 1%，整體僅 3.5%；非百大特店門市無任何回饋）；月上限 5,000 點；需訂閱 UP 選（149 e point/月，或達免費任務）（活動至 2026/12/31）'},
      overseas_online:{rate:4.5,reg:true,regNote:'基礎 1%+UP 選 3.5%=4.5%（線上消費不受歐洲除外限制，含 Amazon、eBay 等百大特店）；月上限 5,000 點'},
      overseas_subscription:{rate:4.5,reg:true,regNote:'基礎 1%+UP 選 3.5%=4.5%；月上限 5,000 點'},
      overseas_hotel:{rate:4.5,reg:true,regNote:'基礎 1%+UP 選 3.5%=4.5%（Booking.com、Agoda、Airbnb 等百大特店）；月上限 5,000 點'},
@@ -883,7 +883,7 @@ const CARD_DB = [
    officialUrl:'https://creditcards.com.tw/creditcard/fubon-j-japan-korea-midnight-credit-card-cashback/',
    defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
-     overseas_physical:{rate:1.0,reg:true,note:'⚠️ 6% 僅限日本/韓國/泰國等指定亞洲國家，英/歐/北美實體僅基本 1%',regNote:'每季登錄一次（每月 20 日 16:00 開放，每月限量 20,000 名）；登錄頁：cardpromote.taipeifubon.com.tw/promotion/Detail?sn=C000307 或 Fubon+ App；日韓泰實體 6%，單筆滿 NT$1,000，每季加碼上限 NT$1,000；⚠️ 需設富邦銀行自動扣繳或申請電子帳單才可享回饋（活動至 2026/09/30）'},
+     overseas_physical:{rate:1.0,reg:true,note:'⚠️ 6% 僅限日本/韓國/泰國等指定亞洲國家，英/歐/北美實體僅基本 1%',regNote:'⚠️ 每月 20 日 16:00 開放搶登錄（每月限量 20,000 名，搶完即止）；登錄成功後本季（Q2: 4–6 月、Q3: 7–9 月）皆有效，不需每月重複登錄（每季總額 60,000 名）；登錄頁：cardpromote.taipeifubon.com.tw/promotion/Detail?sn=C000307 或 Fubon+ App；日韓泰實體 6%，單筆滿 NT$1,000，每季加碼上限 NT$1,000；⚠️ 需設富邦銀行自動扣繳或申請電子帳單才可享回饋（活動至 2026/09/30）'},
      overseas_flight:{rate:3.0,note:'日韓航空購票 3%（含廉航 Peach/Jetstar/Jeju Air 等）'},
      overseas_flight_budget:{rate:3.0,note:'日韓廉航購票 3%（Peach、Jetstar Japan、濟州航空等）'},
      overseas_hotel:{rate:1.0},
@@ -938,7 +938,7 @@ const CARD_DB = [
 ];
 
 /* ============================
-   DEFAULT CARDS (verified 2026/05)
+   DEFAULT CARDS (verified 2026/07)
    ============================ */
 const DC = [
   // ── eco 永續卡 ──────────────────────
@@ -963,14 +963,14 @@ const DC = [
    officialUrl:'https://www.taishinbank.com.tw/TSB/personal/credit/intro/overview/cg047/card001/',
    defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
-     overseas_physical:{rate:3.3,note:'切換「玩旅刷」3.3%（⚠️ 需 L2，須設台新帳戶自扣；無自扣僅 1.3%）'},
-     overseas_online:{rate:3.3,note:'切換「玩旅刷」或「數趣刷」（⚠️ 需 L2；無自扣僅 1.3%）'},
-     overseas_subscription:{rate:3.3,note:'切換「數趣刷」（需 L2）'},
-     overseas_apple:{rate:3.3,note:'切換「數趣刷」（需 L2）'},
-     overseas_insurance:{rate:1.3,note:'保費 1.3%（需 L2；無自扣帳戶約 0.3-1%）'},
-     overseas_flight:{rate:3.3,note:'切換「玩旅刷」（需 L2）'},
-     overseas_hotel:{rate:3.3,note:'切換「玩旅刷」（需 L2）；⭐ 可疊加台新訂房折扣：Agoda（agoda.com/zh-tw/taishinpromo，8% off）、Hotels.com（碼 TSBH）、Expedia（碼 RICHART10，10%）、Booking.com（需從台新活動頁進入）—均需從台新官方活動頁進入才有效'},
-     overseas_default:{rate:3.3,note:'切換「玩旅刷」（需 L2）'},
+     overseas_physical:{rate:3.3,note:'切換「玩旅刷」3.3%（L1/L2 皆適用，無需設自扣即可享回饋；⚠️ 只有「Pay著刷」方案才有 L1/L2 差異）（活動至 2027/03）'},
+     overseas_online:{rate:3.3,note:'切換「玩旅刷」或「數趣刷」3.3%（L1/L2 皆適用）（活動至 2027/03）'},
+     overseas_subscription:{rate:3.3,note:'切換「數趣刷」（L1/L2 皆適用）（活動至 2027/03）'},
+     overseas_apple:{rate:3.3,note:'切換「數趣刷」（L1/L2 皆適用）（活動至 2027/03）'},
+     overseas_insurance:{rate:1.3,note:'保費 1.3%，無上限（免切換方案，L1/L2 皆可）'},
+     overseas_flight:{rate:3.3,note:'切換「玩旅刷」（L1/L2 皆適用）（活動至 2027/03）'},
+     overseas_hotel:{rate:3.3,note:'切換「玩旅刷」（L1/L2 皆適用）（活動至 2027/03）；⭐ 可疊加台新訂房折扣：Agoda（agoda.com/zh-tw/taishinpromo，8% off）、Hotels.com（碼 TSBH）、Expedia（碼 RICHART10，10%）、Booking.com（需從台新官方活動頁進入）—均需從台新官方活動頁進入才有效'},
+     overseas_default:{rate:3.3,note:'切換「玩旅刷」（L1/L2 皆適用）（活動至 2027/03）'},
      tw_cvs:{rate:3.8,note:'切換「Pay著刷」，使用台新Pay（四大超商適用）；LINE Pay 最高 2.3%（L2）（活動至 2027/03）'},
      tw_dining:{rate:3.3,note:'切換「好饗刷」'},
      tw_digital:{rate:3.3,note:'切換「數趣刷」；Klook 需從台新專屬頁進入才有額外折扣：klook.com/zh-TW/tetris/promo/taishinbank/'},

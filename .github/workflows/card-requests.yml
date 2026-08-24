@@ -1,10 +1,11 @@
 name: 卡片請求即時處理
 
 on:
-  schedule:
-    # 每 30 分鐘檢查一次 Google Sheet 是否有 pending 請求
-    - cron: '*/30 * * * *'
-  workflow_dispatch:        # 允許手動觸發
+  # 排程已於 2026/08/19 停用：CLAUDE_CODE_OAUTH_TOKEN 過期，每 30 分鐘排程一跑就失敗並寄失敗信。
+  # 需要時把下面兩行取消註解即可恢復自動處理加卡請求。
+  # schedule:
+  #   - cron: '*/30 * * * *'
+  workflow_dispatch:        # 保留手動觸發（Actions 頁面可 Run workflow）
 
 permissions:
   contents: write           # 讓 Action 能 commit + push
