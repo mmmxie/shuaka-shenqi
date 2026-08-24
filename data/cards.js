@@ -16,6 +16,42 @@
    載入方式：index.html 在主 <script> 之前先載這個檔。
    最上層的 const 會進入共用的 global lexical scope，所以後面的 script 讀得到。
 
+   ── boosts：條件式加碼（2026-08-24 新增）──
+   有些回饋不是「刷了就有」，而是要滿足條件才算：限定星期、每月要搶登錄、
+   必須從特定連結進入……這些條件以前全塞在 note 的自由文字裡，人看得懂、
+   程式讀不懂，所以工具會顯示一個你其實拿不到的樂觀數字。
+
+   boosts 把條件變成結構。放在 overrides 的某個情境底下：
+
+   overseas_physical:{ rate:1.0, note:'...',
+     boosts:[{
+       id:      '全域唯一 id，登錄狀態用它記錄',
+       label:   'UI 顯示的短標籤',
+       rate:    5.0,          // 條件達成後，這個情境的總回饋率
+       baseRate:1.0,          // 條件沒達成時的回饋率（引擎實際會用的保守值）
+       when:{ dow:[2], dom:[1] },   // 選填。dow 1=週一…7=週日；dom=每月幾號
+       channel: '必須從 XX 專屬網頁進入',  // 選填，通路條件的文字說明
+       reg:{ period:'month'|'quarter'|'once', opensDom:1, url:'登錄頁', note:'怎麼登錄', quota:'限量說明' },
+       cap:{ amt:600, per:'month', unit:'好多金' },
+       valid:{ from:'2026-01-01', to:'2026-12-31' },
+       source:'官網 URL', checkedAt:'YYYY-MM-DD'
+     }]}
+
+   ⚠️ when 與 reg.opensDom 是兩件不同的事，別搞混：
+      when       = 【回饋】什麼時候生效（例：只有週二訂房才加碼）
+      reg.opensDom = 【登錄】每月幾號開放搶（登錄成功後整期都算數）
+      富邦 Costco 是後者：每月 1 日搶登錄，搶到之後整個月刷都有 5%。
+      若寫成 when:{dom:[1]}，工具會變成告訴你「只有 1 號刷才有 5%」，那是錯的。
+
+   引擎判定的四種狀態：
+     expired  今天不在 valid 區間 → 整筆忽略，等於沒這個活動
+     notToday 有 when 但今天不符 → 用 baseRate，並算出下次生效日
+     needReg  要登錄但還沒登錄   → 用 baseRate，UI 給一鍵登錄連結
+     active   條件都滿足         → 用 rate
+
+   ⚠️ 排序一律用「今天實際拿得到的」淨回饋，不是 rate。
+      把一張你沒登錄的卡排第一名，那個數字是騙自己的。
+
    ── 兩個陣列的關係 ──
    CARD_DB：完整資料庫（28 張），搜尋與比較都以它為準。
    DC：使用者預設持有的卡，是 CARD_DB 的子集。
@@ -40,7 +76,19 @@ const CARD_DB = [
      overseas_apple:{rate:3.3,note:'切換「數趣刷」方案（L1/L2 皆適用）（活動至 2027/03）'},
      overseas_insurance:{rate:1.3,note:'保費 1.3%，無上限（免切換方案，L1/L2 皆可）'},
      overseas_flight:{rate:3.3,note:'切換「玩旅刷」方案（L1/L2 皆適用）（活動至 2027/03）'},
-     overseas_hotel:{rate:3.3,note:'切換「玩旅刷」方案（L1/L2 皆適用）（活動至 2027/03）'},
+     overseas_hotel:{rate:3.3,note:'切換「玩旅刷」方案（L1/L2 皆適用）（活動至 2027/03）',
+       boosts:[{
+         id:'taishin-richart-agoda-portal',
+         label:'Agoda 專屬網頁',
+         // 3.3% 卡回饋 ＋ Agoda 端最高 8% 現折。官網寫「最高」，實際依房型與房價而定，
+         // 所以 UI 一律標示成「最高」，不可當成保證值。
+         rate:11.3, baseRate:3.3,
+         channel:'必須從「Agoda x Richart 卡專屬網頁」進入訂房。直接開 Agoda App 或官網訂，只有卡本身的 3.3%，拿不到現折。',
+         url:'https://mkpcard.taishinbank.com.tw/tscccms/promotion/detail/WM_20251226092735504',
+         maxOnly:true,
+         valid:{from:'2026-01-01',to:'2026-12-31'},
+         source:'https://mkpcard.taishinbank.com.tw/tscccms/promotion/detail/WM_20251226092735504',
+         checkedAt:'2026-08-24'}]},
      overseas_default:{rate:3.3,note:'切換「玩旅刷」方案（L1/L2 皆適用）（活動至 2027/03）'},
      tw_cvs:{rate:3.8,note:'切換「Pay著刷」，使用台新 Pay（四大超商適用，無單筆金額限制）；LINE Pay 最高 2.3%（L2）（活動至 2027/03）'},
      tw_dining:{rate:3.3,note:'切換「好饗刷」方案'},
@@ -100,7 +148,22 @@ const CARD_DB = [
    defaultRate:1.0,capKey:'overseas_physical',capAmt:600,capBonusOnly:true,capBonusPct:4,capBaseRate:1.0,
    overrides:{
      tw_costco:{rate:2.0,note:'Costco 消費 2% 好多金'},
-     overseas_physical:{rate:5.0,note:'海外實體 5%（⚠️ 每月 1 日 00:00 搶登錄，限量 50,000 名；搶不到僅 1%；好多金只能折抵 Costco），回饋上限 NT$600/期（活動至 2026/12/31）'},
+     overseas_physical:{rate:5.0,note:'海外實體 5%（⚠️ 每月 1 日 00:00 搶登錄，限量 50,000 名；搶不到僅 1%；好多金只能折抵 Costco），回饋上限 NT$600/期（活動至 2026/12/31）',
+       boosts:[{
+         id:'fubon-costco-oversea-monthly',
+         label:'每月 1 日搶登錄',
+         rate:5.0, baseRate:1.0,
+         // 注意 when 與 reg.opensDom 是兩件事：
+         // 這個活動沒有 when（登錄成功後整個月刷都算 5%），
+         // 但登錄本身只在每月 1 日開放搶，所以用 reg.opensDom 表達。
+         reg:{period:'month', opensDom:1,
+              url:'https://cardpromote.taipeifubon.com.tw/promotion/Detail?sn=C000270',
+              note:'每月1日00:00開放登錄，可透過網銀、行銀或撥打登錄專線辦理',
+              quota:'每月限量 5 萬名，額滿提前終止，恕無法補登'},
+         cap:{amt:600,per:'month',unit:'好多金'},
+         valid:{from:'2026-01-01',to:'2026-12-31'},
+         source:'https://cardpromote.taipeifubon.com.tw/promotion/Detail?sn=C000270',
+         checkedAt:'2026-08-24'}]},
      tw_default:{rate:1.0},
    }},
   // ─── 將來銀行 ───

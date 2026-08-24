@@ -351,6 +351,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","
     <button class="schip" onclick="quickSearch('加油')">⛽ 加油</button>
     <button class="schip" onclick="quickSearch('日本')">🇯🇵 日本</button>
   </div>
+  <!-- 今日看板：只在有「今天該做的事」時才出現，沒事就完全不佔版面 -->
+  <div id="today-board"></div>
   <div id="res"></div>
   <div class="fn">回饋率以各銀行官網最新公告為準 · 2026/07</div>
 </div>
@@ -362,6 +364,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","
   <div class="cl" id="clist"></div>
   <div style="height:10px"></div>
   <button class="addb" onclick="openPicker()"><span style="font-size:22px">➕</span>新增卡片</button>
+</div>
+
+<!-- 登錄待辦 -->
+<div id="scr-reg" class="scr">
+  <div class="lbl">登錄待辦</div>
+  <div class="page-sub">有些回饋要先登錄才算。勾起來記錄你登錄過了，期別一換會自動歸零。</div>
+  <div id="reg-list"></div>
 </div>
 
 <!-- SETTINGS -->
@@ -894,6 +903,46 @@ function go(id){
   if(m[id])document.getElementById(m[id]).classList.add('on');
   if(id==='cards')renderCards();
   if(id==='set')renderSources();
+  if(id==='reg')renderRegPage();
+}
+
+/* 登錄待辦頁。把所有「要登錄才算」的活動列成 checklist。
+   勾選狀態記的是期別（見 periodKey），所以下個月自動全部變回未登錄 ——
+   不需要任何排程或提醒機制去重置它。 */
+function renderRegPage(){
+  const el=document.getElementById('reg-list'); if(!el)return;
+  const now=new Date();
+  const items=allBoosts(now).filter(x=>x.boost.reg);
+  if(!items.length){
+    el.innerHTML=`<div class="emp"><div class="empi">✅</div>
+      <div style="font-size:14px">目前沒有需要登錄的活動</div></div>`;
+    return;
+  }
+  const PERIOD_L={month:'每月',quarter:'每季',once:'一次性'};
+  el.innerHTML=items.map(x=>{
+    const b=x.boost, done=isRegDone(b,now);
+    const link=b.reg.url?`<a href="${b.reg.url}" target="_blank" rel="noopener"
+      style="color:#2563eb;font-size:11.5px;font-weight:600;text-decoration:none">開啟登錄頁 ↗</a>`:'';
+    return `<div class="sbox" style="margin-bottom:8px">
+      <div style="display:flex;gap:10px;align-items:flex-start">
+        <input type="checkbox" ${done?'checked':''} style="margin-top:3px;width:17px;height:17px;flex:none;cursor:pointer"
+          onchange="toggleReg('${b.id}','${b.reg.period}');renderRegPage();renderToday();renderSearchResult()">
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:13.5px">${sEsc(x.card.name)}
+            <span style="font-weight:400;color:#6b7280">${sEsc(b.label)}</span></div>
+          <div style="font-size:11.5px;color:#6b7280;margin-top:3px;line-height:1.6">
+            ${PERIOD_L[b.reg.period]||b.reg.period}登錄　·　${sEsc(rkLabel(x.rk))}　·
+            未登錄 ${b.baseRate.toFixed(1)}% → 登錄後 ${b.maxOnly?'最高 ':''}${b.rate.toFixed(1)}%
+            ${b.reg.note?`<br>${sEsc(b.reg.note)}`:''}
+            ${b.reg.quota?`<br><span style="color:#b45309">⚠️ ${sEsc(b.reg.quota)}</span>`:''}
+          </div>
+          <div style="margin-top:5px">${link}</div>
+        </div>
+        <div style="flex:none;font-size:11px;font-weight:700;color:${done?'#15803d':'#b45309'}">
+          ${done?'✅ 已登錄':'⬜️ 未登錄'}</div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 /* ============================
@@ -964,17 +1013,205 @@ function renderQuickAmts(){
     `<button class="qb${v===ST.qbSel?' sel':''}" onclick="sa(${v})">${v.toLocaleString()}</button>`).join('');
 }
 
+/* ============================================================
+   BOOSTS — 條件式加碼引擎
+   ============================================================
+   有些回饋要滿足條件才拿得到：限定星期、每月要搶登錄、必須從特定連結進入。
+   這裡負責回答一個問題：「這張卡在這個情境，你【今天】實際拿得到幾 %？」
+   資料格式見 data/cards.js 開頭的說明。
+   ============================================================ */
+
+const REG_KEY='shenqi4_reg';
+
+// 登錄狀態存的是「登錄的是哪一期」，不是 true/false。
+// 這樣期別一換（下個月、下一季），舊紀錄自動失效，不需要另外寫重置邏輯。
+function periodKey(period,now){
+  const y=now.getFullYear();
+  if(period==='quarter')return y+'-Q'+(Math.floor(now.getMonth()/3)+1);
+  if(period==='once')return 'once';
+  return y+'-'+String(now.getMonth()+1).padStart(2,'0');   // month（預設）
+}
+function regLoad(){ try{return JSON.parse(localStorage.getItem(REG_KEY))||{};}catch(e){return{};} }
+function regSave(o){ try{localStorage.setItem(REG_KEY,JSON.stringify(o));}catch(e){} }
+function isRegDone(b,now){
+  if(!b.reg)return true;                       // 不需登錄，視為已達成
+  const want=periodKey(b.reg.period,now);
+  return regLoad()[b.id]===want;
+}
+function toggleReg(boostId,period){
+  const now=new Date(), o=regLoad(), want=periodKey(period,now);
+  if(o[boostId]===want) delete o[boostId]; else o[boostId]=want;
+  regSave(o);
+}
+
+function inSeason(b,now){
+  if(!b.valid)return true;
+  const t=now.getTime();
+  if(b.valid.from && t < new Date(b.valid.from+'T00:00:00').getTime())return false;
+  if(b.valid.to   && t > new Date(b.valid.to  +'T23:59:59').getTime())return false;
+  return true;
+}
+// dow: 1=週一 … 7=週日（跟 getDay() 的 0=週日 差一個轉換）
+function dowOf(d){ return d.getDay()===0?7:d.getDay(); }
+function matchesWhen(b,now){
+  if(!b.when)return true;
+  if(b.when.dow && !b.when.dow.includes(dowOf(now)))return false;
+  if(b.when.dom && !b.when.dom.includes(now.getDate()))return false;
+  return true;
+}
+// 下一次符合 when 的日期。往後找 400 天，找不到就回 null。
+function nextHit(b,now){
+  if(!b.when)return null;
+  const d=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  for(let i=1;i<=400;i++){
+    d.setDate(d.getDate()+1);
+    if(!inSeason(b,d))continue;
+    if(matchesWhen(b,d))return d;
+  }
+  return null;
+}
+
+// 下一個「每月第 N 日」。這個月的還沒過就回這個月，過了就回下個月。
+function nextDom(dom,now){
+  const d=new Date(now.getFullYear(),now.getMonth(),dom);
+  if(d<new Date(now.getFullYear(),now.getMonth(),now.getDate()))
+    d.setMonth(d.getMonth()+1);
+  return d;
+}
+
+const DOW_L=['','週一','週二','週三','週四','週五','週六','週日'];
+function fmtDate(d){ return `${d.getMonth()+1}/${d.getDate()}（${DOW_L[dowOf(d)]}）`; }
+
+/* 回傳這個情境今天實際適用的 boost 與狀態。
+   state: 'active' 條件都滿足 ｜ 'needReg' 要登錄但沒登錄 ｜ 'notToday' 今天不符時間條件 */
+function pickBoost(ov,now){
+  if(!ov||!ov.boosts||!ov.boosts.length)return null;
+  const live=ov.boosts.filter(b=>inSeason(b,now));
+  if(!live.length)return null;                 // 全部過期，等於沒這個活動
+  // 先挑今天真的能用的；都不能用就挑潛在最高的那筆來提示
+  const usable=live.filter(b=>matchesWhen(b,now)&&isRegDone(b,now));
+  const b=usable.length
+    ? usable.reduce((a,c)=>c.rate>a.rate?c:a)
+    : live.reduce((a,c)=>c.rate>a.rate?c:a);
+  const state=!matchesWhen(b,now) ? 'notToday'
+            : !isRegDone(b,now)   ? 'needReg'
+            : 'active';
+  return {boost:b,state,nextDate:state==='notToday'?nextHit(b,now):null};
+}
+
+/* ── 掃出全資料庫的條件式活動，附上今天的狀態 ── */
+function allBoosts(now){
+  now=now||new Date();
+  const out=[];
+  CARD_DB.forEach(card=>Object.entries(card.overrides||{}).forEach(([rk,ov])=>{
+    (ov.boosts||[]).forEach(b=>{
+      if(!inSeason(b,now))return;                 // 過期的不列
+      const state=!matchesWhen(b,now)?'notToday':(!isRegDone(b,now)?'needReg':'active');
+      out.push({card,rk,boost:b,state,nextDate:state==='notToday'?nextHit(b,now):null});
+    });
+  }));
+  return out;
+}
+
+/* 今日看板。原則：沒有「今天該做的事」就整塊不出現，不製造雜訊。 */
+function renderToday(){
+  const el=document.getElementById('today-board'); if(!el)return;
+  const now=new Date();
+  const all=allBoosts(now);
+  const needReg=all.filter(x=>x.state==='needReg');
+  const active =all.filter(x=>x.state==='active'&&x.boost.when);   // 有時間條件且今天正好命中，才值得提醒
+  const soon   =all.filter(x=>x.state==='notToday'&&x.nextDate)
+                   .filter(x=>(x.nextDate-now)/86400000<=14)
+                   .sort((a,b)=>a.nextDate-b.nextDate).slice(0,3);
+  if(!needReg.length&&!active.length&&!soon.length){el.innerHTML='';return;}
+
+  const rows=[];
+  active.forEach(x=>rows.push(`<div style="padding:8px 0;border-top:1px solid #dcfce7">
+    🟢 <strong>今天生效</strong>　${sEsc(x.card.name)} · ${sEsc(x.boost.label)}
+    <span style="color:#15803d;font-weight:700">${x.boost.maxOnly?'最高':''}${x.boost.rate.toFixed(1)}%</span></div>`));
+  needReg.forEach(x=>{
+    const b=x.boost;
+    const btn=b.reg&&b.reg.url
+      ? `<a href="${b.reg.url}" target="_blank" rel="noopener" style="background:#b45309;color:#fff;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:700;text-decoration:none;margin-left:6px">登錄 ↗</a>`:'';
+    // 登錄開放日：今天就開放的話要喊得大聲一點（富邦那種限量 5 萬名的，晚幾小時就沒了）
+    const od=b.reg&&b.reg.opensDom;
+    const opensToday=od&&now.getDate()===od;
+    const opensNext=od&&!opensToday?nextDom(od,now):null;
+    const head=opensToday
+      ? `🔴 <strong>今天開放登錄，快去搶</strong>`
+      : (opensNext?`🟡 <strong>${fmtDate(opensNext)} 開放登錄</strong>`:`🟡 <strong>還沒登錄</strong>`);
+    rows.push(`<div style="padding:8px 0;border-top:1px solid #fde68a">
+      ${head}　${sEsc(x.card.name)} · ${sEsc(b.label)}
+      <span style="color:#92400e">${b.baseRate.toFixed(1)}% → ${b.rate.toFixed(1)}%</span>${btn}
+      ${b.reg&&b.reg.quota?`<div style="font-size:11px;color:#b45309;margin-top:2px">⚠️ ${sEsc(b.reg.quota)}</div>`:''}</div>`);
+  });
+  soon.forEach(x=>rows.push(`<div style="padding:8px 0;border-top:1px solid #e2e8f0;color:#475569">
+    ⚪️ <strong>${fmtDate(x.nextDate)}</strong>　${sEsc(x.card.name)} · ${sEsc(x.boost.label)} 可達 ${x.boost.rate.toFixed(1)}%</div>`));
+
+  const bg=needReg.length?'#fffbeb':(active.length?'#f0fdf4':'#f8fafc');
+  const bd=needReg.length?'#fcd34d':(active.length?'#86efac':'#e2e8f0');
+  el.innerHTML=`<div style="margin:14px 16px 0;background:${bg};border:1px solid ${bd};border-radius:10px;padding:11px 13px;font-size:12.5px;line-height:1.5">
+    <div style="font-weight:700;margin-bottom:2px">📅 ${fmtDate(now)}</div>
+    ${rows.join('')}
+    <div style="margin-top:8px"><a href="#" onclick="go('reg');return false" style="color:#2563eb;font-size:11.5px;font-weight:600;text-decoration:none">查看全部登錄待辦 →</a></div>
+  </div>`;
+}
+
+/* ── boost 的 UI 呈現 ──────────────────────────────
+   三種狀態給三種顏色，讓「拿得到」跟「拿不到」一眼分得出來。 */
+function boostBanner(r){
+  const bi=r.boostInfo; if(!bi)return '';
+  const b=bi.boost, mx=b.maxOnly?'最高 ':'';
+  const src=b.source?` <a href="${b.source}" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;opacity:.75">官網</a>`:'';
+  if(bi.state==='needReg'){
+    const btn=b.reg&&b.reg.url
+      ? `<a href="${b.reg.url}" target="_blank" rel="noopener" style="display:inline-block;margin-top:6px;background:#b45309;color:#fff;padding:5px 11px;border-radius:6px;font-size:12px;font-weight:700;text-decoration:none">前往登錄 ↗</a>`:'';
+    return `<div class="wc2-note" style="background:#fffbeb;color:#92400e">
+      🟡 <strong>你還沒登錄，現在只有 ${(r.gross).toFixed(1)}%</strong>　登錄後可達 ${mx}${b.rate.toFixed(1)}%
+      <div style="margin-top:4px;font-weight:400">${sEsc(b.reg?b.reg.note:'')}${b.reg&&b.reg.quota?`<br>⚠️ ${sEsc(b.reg.quota)}`:''}</div>
+      ${btn}${src}</div>`;
+  }
+  if(bi.state==='notToday'){
+    const nd=bi.nextDate?fmtDate(bi.nextDate):'—';
+    return `<div class="wc2-note" style="background:#f1f5f9;color:#475569">
+      ⚪️ <strong>今天不適用「${sEsc(b.label)}」</strong>　下次 <strong>${nd}</strong> 可達 ${mx}${b.rate.toFixed(1)}%${src}</div>`;
+  }
+  // active
+  const ch=b.channel?`<div style="margin-top:4px;font-weight:400">⚠️ ${sEsc(b.channel)}</div>`:'';
+  const link=b.url?`<a href="${b.url}" target="_blank" rel="noopener" style="display:inline-block;margin-top:6px;background:#15803d;color:#fff;padding:5px 11px;border-radius:6px;font-size:12px;font-weight:700;text-decoration:none">開啟專屬頁 ↗</a>`:'';
+  return `<div class="wc2-note" style="background:#f0fdf4;color:#166534">
+    🟢 <strong>今日可達 ${mx}${b.rate.toFixed(1)}%</strong>　${sEsc(b.label)}${ch}${link}${src}</div>`;
+}
+function boostBadge(r){
+  const bi=r.boostInfo; if(!bi)return '';
+  const b=bi.boost, mx=b.maxOnly?'最高':'';
+  if(bi.state==='needReg') return ` · <span style="color:#b45309;font-weight:700">🟡 未登錄（可達 ${mx}${b.rate.toFixed(1)}%）</span>`;
+  if(bi.state==='notToday') return ` · <span style="color:#64748b">⚪️ 下次 ${bi.nextDate?fmtDate(bi.nextDate):'—'}</span>`;
+  return ` · <span style="color:#15803d;font-weight:700">🟢 ${mx}${b.rate.toFixed(1)}%</span>`;
+}
+
 /* ============================
    RATE CALCULATION (core)
    ============================ */
-function calcCard(card,rk,isTW,amtTWD){
+function calcCard(card,rk,isTW,amtTWD,now){
+  now=now||new Date();
   if(card.isRevolut)return{gross:0,fee:0,net:0,cashback:0,capped:false,isRevolut:true};
 
   // Resolve override
   let ov=card.overrides[rk];
   if(!ov&&!isTW)ov=card.overrides['overseas_default'];
   if(!ov&&isTW)ov=card.overrides['tw_default'];
-  const rate=ov?ov.rate:card.defaultRate;
+  // 條件式加碼：決定今天實際適用哪個數字
+  const bi=pickBoost(ov,now);
+  let rate=ov?ov.rate:card.defaultRate;
+  let boostInfo=null;
+  if(bi){
+    const b=bi.boost;
+    // active 才給 boost 的高值；notToday / needReg 一律退回保守值。
+    // 這是整個設計的重點：排序看的是你今天真的拿得到的，不是帳面最高的。
+    rate = bi.state==='active' ? b.rate : (b.baseRate!=null?b.baseRate:rate);
+    boostInfo={...bi, potentialRate:b.rate, gap:b.rate-rate};
+  }
   const fee=rk.startsWith('overseas_')?card.fee:0;
   const note=ov?ov.note||null:null;
   const reg=ov?ov.reg||false:false;
@@ -986,7 +1223,11 @@ function calcCard(card,rk,isTW,amtTWD){
   let capped=false;
   let trackerCapped=false;
 
-  const capApplies=card.capAmt>0&&(!card.capKey||card.capKey===rk);
+  // boost 沒達成時，加碼那一段根本不該發生 —— 連帶也就沒有「加碼上限」可言。
+  // 這裡必須跳過下面的 capBonusOnly 路徑，否則它會用 capBonusPct+capBaseRate
+  // 自己重算，把我們剛降下來的 rate 蓋掉（富邦 Costco 未登錄卻算出 5% 就是這樣來的）。
+  const boostDowngraded = !!(boostInfo && boostInfo.state!=='active' && boostInfo.boost.baseRate!=null);
+  const capApplies=!boostDowngraded && card.capAmt>0&&(!card.capKey||card.capKey===rk);
   const spentTWD=capApplies&&card.tracker?(card.tracker.spent||0):0;
 
   if(capApplies){
@@ -1020,7 +1261,8 @@ function calcCard(card,rk,isTW,amtTWD){
   const net=effectiveGross-fee;
 
   return{gross:rate,fee,net,cashback,capped,trackerCapped,note,reg,regNote,rateKey:rk,
-    capAmt:card.capAmt,isRestricted:card.rewardType==='restricted',rewardLabel:card.rewardLabel};
+    capAmt:card.capAmt,isRestricted:card.rewardType==='restricted',rewardLabel:card.rewardLabel,
+    boostInfo};
 }
 
 /* ============================
@@ -1369,6 +1611,7 @@ function renderSearchResult(){
     </div>
     ${w.note?`<div class="wc2-note">ℹ️ ${w.note}</div>`:''}
     ${regBanner}
+    ${boostBanner(w)}
     ${capHint}
     ${w.isRestricted?`<div class="wc2-note">⚠️ 回饋形式為「${w.rewardLabel}」，並非現金，請評估使用場合。</div>`:''}
     ${official}
@@ -1385,7 +1628,7 @@ function renderSearchResult(){
       <div class="rinfo">
         <div class="rname">${r.card.name}</div>
         <div class="rbank">${r.card.bank}</div>
-        <div class="rmeta">${capA?`上限 NT$${r.capAmt.toLocaleString()}/月`:(parseCap(r.note)?'上限 '+parseCap(r.note):'無上限')}${e2?` · 至 ${e2}`:''}${r.reg?' · 需登錄':''}</div>
+        <div class="rmeta">${capA?`上限 NT$${r.capAmt.toLocaleString()}/月`:(parseCap(r.note)?'上限 '+parseCap(r.note):'無上限')}${e2?` · 至 ${e2}`:''}${r.reg?' · 需登錄':''}${boostBadge(r)}</div>
       </div>
       <div class="rrate" style="color:${nc}">${r.net.toFixed(1)}<span style="font-size:12px">%</span></div>
     </div>`);
@@ -1766,6 +2009,7 @@ loadCards();
 // First-use hint
 if(!localStorage.getItem('shenqi4_seen')){document.getElementById('first-hint').style.display='block';}
 buildSearchIndex();
+renderToday();
 // 還原上次查詢與結果
 (function(){
   const lastQ=localStorage.getItem('shenqi4_q')||'';
