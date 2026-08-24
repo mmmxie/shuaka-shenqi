@@ -376,6 +376,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","
 <!-- SETTINGS -->
 <div id="scr-set" class="scr">
   <div class="lbl">設定</div>
+  <!-- 今日看板沒事時不出現，所以登錄待辦必須有一個固定入口 -->
+  <div class="sbox">
+    <div class="srow" onclick="go('reg')" style="cursor:pointer;user-select:none">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="srt" style="margin-bottom:0">📋 登錄待辦</div>
+        <span id="reg-count-badge" style="font-size:12px;color:var(--accent);font-weight:700"></span>
+      </div>
+      <div class="srs" style="margin-top:4px">有些回饋要先登錄才算，這裡列出全部並記錄你登錄了沒</div>
+    </div>
+  </div>
   <div class="sbox">
     <div class="srow" onclick="toggleSrc()" style="cursor:pointer;user-select:none">
       <div style="display:flex;justify-content:space-between;align-items:center">
@@ -902,8 +912,16 @@ function go(id){
   const m={home:'nb-home',cards:'nb-cards',set:'nb-set'};
   if(m[id])document.getElementById(m[id]).classList.add('on');
   if(id==='cards')renderCards();
-  if(id==='set')renderSources();
+  if(id==='set'){renderSources();updateRegBadge();}
   if(id==='reg')renderRegPage();
+}
+
+// 設定頁上的「還有幾個沒登錄」小標記
+function updateRegBadge(){
+  const el=document.getElementById('reg-count-badge'); if(!el)return;
+  const n=allBoosts(new Date()).filter(x=>x.state==='needReg').length;
+  el.textContent=n?`${n} 個未登錄`:'✅ 都完成了';
+  el.style.color=n?'#b45309':'#15803d';
 }
 
 /* 登錄待辦頁。把所有「要登錄才算」的活動列成 checklist。
@@ -1590,6 +1608,11 @@ function renderSearchResult(){
   const regBanner=(w.reg&&w.regNote)?`<div class="wc2-note" style="background:#eff6ff;color:#1e40af">📋 <strong>需先登錄才有此回饋</strong>：${linkify(w.regNote)}</div>`:'';
   // 官網連結（驗證來源）
   const official=w.card.officialUrl?`<a href="${w.card.officialUrl}" target="_blank" rel="noopener" style="display:inline-block;margin-top:12px;font-size:12px;color:#2563eb;text-decoration:none;font-weight:600">🔗 查官網確認最新條件 ↗</a>`:'';
+  // 資料可信度：查核過的就寫明日期，沒查核過的就老實說沒有。
+  // 不標示等於默認「這數字可信」，那是誤導 —— 使用者有權知道哪些數字沒人對過官網。
+  const prov=w.card.checkedAt
+    ? `<div style="margin-top:6px;font-size:11px;color:#6b7280">✔️ 已對官網查核：${w.card.checkedAt}</div>`
+    : `<div style="margin-top:6px;font-size:11px;color:#b45309">⚠️ 這張卡尚未對官網逐項查核，數字僅供參考</div>`;
   const html=[];
   html.push(`<div class="rsum-cx"><span class="rsum-f">${reg.f}</span> ${scen.l}</div>`);
   html.push(`<div class="wc2">
@@ -1615,6 +1638,7 @@ function renderSearchResult(){
     ${capHint}
     ${w.isRestricted?`<div class="wc2-note">⚠️ 回饋形式為「${w.rewardLabel}」，並非現金，請評估使用場合。</div>`:''}
     ${official}
+    ${prov}
   </div>`);
   html.push(`<div class="lbl" style="margin:16px 16px 0">完整比較（${ranked.length} 張卡）</div>`);
   html.push('<div class="rlist">');
