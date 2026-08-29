@@ -59,22 +59,6 @@
       否則會出現「搜尋看到 800、加入後變 600」這種不一致。
    ============================================================ */
 
-/* 台新 Richart 的 LEVEL 2 條件在十幾個情境重複出現，抽成產生器避免貼十幾次。
-   關鍵：所有情境共用同一個 boost id，所以「登錄待辦」頁只出現一個勾選項，
-   使用者勾一次（代表已設定台新帳戶自動扣繳），全部情境同步從 1.3% 升到 3.3%。 */
-function RICHART_L2(label){
-  return {
-    id:'taishin-richart-l2',
-    label:'LEVEL 2（'+label+'）',
-    rate:3.3, baseRate:1.3,
-    reg:{period:'once',
-         url:'https://www.taishinbank.com.tw/TSB/personal/credit/intro/overview/cg047/card001/',
-         note:'需以台新帳戶設定自動扣繳台新信用卡帳款才具 LEVEL 2 資格。新申辦 60 天內免設定即享 LEVEL 2'},
-    valid:{from:'2026-01-01',to:'2027-03-31'},
-    source:'https://www.taishinbank.com.tw/TSB/personal/credit/intro/overview/cg047/card001/',
-    checkedAt:'2026-08-24'
-  };
-}
 
 /* ============================
    CARD DATABASE (verified 2026/07)
@@ -85,52 +69,38 @@ const CARD_DB = [
   {id:'richart',bank:'台新銀行',name:'Richart 卡',
    color:'#E8001D',fee:1.5,rewardType:'points',rewardLabel:'台新Point（可折抵帳單）',
    officialUrl:'https://www.taishinbank.com.tw/TSB/personal/credit/intro/overview/cg047/card001/',
-   source:'https://www.taishinbank.com.tw/TSB/personal/credit/intro/overview/cg047/card001/',checkedAt:'2026-08-24',
-   // 2026-08-24 查核大修：原資料把 L1/L2 寫反了。官網權益方案表格中 LEVEL 1 那格
-   // 帶 rowspan="4"、值為 1.3%，代表 1.3% 涵蓋全部四個方案；3.3%/3.8%/2.3%/2% 全屬 LEVEL 2。
-   // 內文另有明文「未完成設定者，享切換刷加碼通路最高1.3%」。
-   // 原本每格寫「L1/L2 皆適用」「無需設自扣」，等於把所有人都當成 L2 計算。
-   // 現改用 boosts 表達：沒設自動扣繳 = 1.3%，設了 = 3.3%。同一個 boost id
-   // 讓登錄待辦頁只出現一個勾選項，勾一次全部情境同步生效。
+   source:'https://www.taishinbank.com.tw/TSB/personal/credit/intro/overview/cg047/card001/',checkedAt:'2026-08-29',
+   // 2026-08-29 查核（二次確認）：新活動期 2026/7/1–2027/3/31，官網明文
+   // 玩旅刷/好饗刷/數趣刷 L1/L2 均為 3.3%；Pay著刷（台新 Pay）L1/L2 均為 3.8%。
+   // 原 RICHART_L2 boost（L1=1.3%→L2=3.3%）已不適用，全數移除。
+   // 新增「Chill刷」方案（L1=1.3%，L2=3.3%–10%），目前未建模，待人工確認後補入。
+   // ⚠️ tw_insurance 是否也升至 3.3% 官網未明確確認，保守維持 1.3%，待人工複查。
    defaultRate:0.3,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
-     overseas_physical:{rate:1.3,note:'切換「玩旅刷」。LEVEL 2 為 3.3%，LEVEL 1 僅 1.3%（活動至 2027/03）',
-       boosts:[RICHART_L2('玩旅刷 · 海外實體')]},
-     overseas_online:{rate:1.3,note:'切換「玩旅刷」或「數趣刷」。LEVEL 2 為 3.3%，LEVEL 1 僅 1.3%（活動至 2027/03）',
-       boosts:[RICHART_L2('玩旅刷／數趣刷 · 海外線上')]},
-     overseas_subscription:{rate:1.3,note:'切換「數趣刷」。LEVEL 2 為 3.3%，LEVEL 1 僅 1.3%（活動至 2027/03）',
-       boosts:[RICHART_L2('數趣刷 · 海外訂閱')]},
-     overseas_apple:{rate:1.3,note:'⚠️ Apple 不在「數趣刷」清單內。海外 Apple 消費請走「玩旅刷」海外消費計算。LEVEL 2 為 3.3%，LEVEL 1 僅 1.3%',
-       boosts:[RICHART_L2('玩旅刷 · 海外 Apple')]},
+     overseas_physical:{rate:3.3,note:'切換「玩旅刷」，L1/L2 均為 3.3%（活動至 2027/03）'},
+     overseas_online:{rate:3.3,note:'切換「玩旅刷」或「數趣刷」，L1/L2 均為 3.3%（活動至 2027/03）'},
+     overseas_subscription:{rate:3.3,note:'切換「數趣刷」，L1/L2 均為 3.3%（活動至 2027/03）'},
+     overseas_apple:{rate:3.3,note:'⚠️ Apple 不在「數趣刷」清單內。海外 Apple 消費請走「玩旅刷」海外消費計算，L1/L2 均為 3.3%（活動至 2027/03）'},
      overseas_insurance:{rate:0.3,note:'⚠️ 海外保費不算加碼通路。官網明文「保費認列不含國外保險交易…海外保險、非臺灣保險公司扣繳之保險費」，僅一般消費 0.3%'},
-     overseas_flight:{rate:1.3,note:'切換「玩旅刷」。LEVEL 2 為 3.3%，LEVEL 1 僅 1.3%（活動至 2027/03）',
-       boosts:[RICHART_L2('玩旅刷 · 機票')]},
-     overseas_hotel:{rate:1.3,note:'切換「玩旅刷」。LEVEL 2 為 3.3%，LEVEL 1 僅 1.3%（活動至 2027/03）',
-       boosts:[RICHART_L2('玩旅刷 · 訂房'),{
-         // 共用 taishin-richart-l2 這個 id，因為 11.3% 的組成裡有 3.3% 卡回饋，
-         // 一樣要先有 LEVEL 2。沒設自動扣繳時退回 1.3%，不是 3.3%。
-         id:'taishin-richart-l2',
-         label:'LEVEL 2 ＋ Agoda 專屬網頁',
-         // 3.3% 卡回饋 ＋ Agoda 端最高 8% 現折。官網寫「最高」，實際依房型與房價而定，
-         // 所以 UI 一律標示成「最高」，不可當成保證值。
-         rate:11.3, baseRate:1.3, maxOnly:true,
-         channel:'必須從「Agoda x Richart 卡專屬網頁」進入訂房。直接開 Agoda App 或官網訂，只有卡本身的回饋，拿不到現折。',
+     overseas_flight:{rate:3.3,note:'切換「玩旅刷」，L1/L2 均為 3.3%（活動至 2027/03）'},
+     overseas_hotel:{rate:3.3,note:'切換「玩旅刷」，L1/L2 均為 3.3%（活動至 2027/03）',
+       boosts:[{
+         id:'richart-agoda-hotel',
+         label:'Agoda 專屬網頁訂房',
+         // 3.3% 卡回饋 ＋ Agoda 端最高 8% 現折，合計最高 11.3%；實際折扣依房型與房價而定。
+         rate:11.3, baseRate:3.3, maxOnly:true,
+         channel:'必須從「Agoda x Richart 卡專屬網頁」進入訂房。直接開 Agoda App 或官網訂，只有卡本身的 3.3%，拿不到現折。',
          url:'https://mkpcard.taishinbank.com.tw/tscccms/promotion/detail/WM_20251226092735504',
-         reg:{period:'once',
-              url:'https://www.taishinbank.com.tw/TSB/personal/credit/intro/overview/cg047/card001/',
-              note:'需以台新帳戶設定自動扣繳台新信用卡帳款才具 LEVEL 2 資格（新申辦 60 天內免設定即享 LEVEL 2）'},
          valid:{from:'2026-01-01',to:'2026-12-31'},
          source:'https://mkpcard.taishinbank.com.tw/tscccms/promotion/detail/WM_20251226092735504',
          checkedAt:'2026-08-24'}]},
-     overseas_default:{rate:1.3,note:'切換「玩旅刷」。LEVEL 2 為 3.3%，LEVEL 1 僅 1.3%（活動至 2027/03）',
-       boosts:[RICHART_L2('玩旅刷 · 其他海外')]},
-     tw_cvs:{rate:1.3,note:'切換「Pay著刷」，使用台新 Pay。⚠️ 台新Pay 限全家、7-11 兩大超商（非四大）；LINE Pay 最高 2.3% 且不含四大超商。LEVEL 2 為 3.8%，LEVEL 1 僅 1.3%（活動至 2027/03）',
-       boosts:[{...RICHART_L2('Pay著刷 · 超商'),rate:3.8}]},
-     tw_dining:{rate:1.3,note:'切換「好饗刷」。LEVEL 2 為 3.3%，LEVEL 1 僅 1.3%',boosts:[RICHART_L2('好饗刷 · 餐飲')]},
-     tw_digital:{rate:1.3,note:'切換「數趣刷」。LEVEL 2 為 3.3%，LEVEL 1 僅 1.3%',boosts:[RICHART_L2('數趣刷 · 台灣數位')]},
-     tw_shopee:{rate:1.3,note:'切換「數趣刷」。LEVEL 2 為 3.3%，LEVEL 1 僅 1.3%',boosts:[RICHART_L2('數趣刷 · 蝦皮')]},
+     overseas_default:{rate:3.3,note:'切換「玩旅刷」，L1/L2 均為 3.3%（活動至 2027/03）'},
+     tw_cvs:{rate:3.8,note:'切換「Pay著刷」，台新 Pay 超商 3.8%，L1/L2 均為 3.8%（⚠️ 限全家、7-11 兩大超商；LINE Pay 最高 2.3% 且不含四大超商）（活動至 2027/03）'},
+     tw_dining:{rate:3.3,note:'切換「好饗刷」，L1/L2 均為 3.3%（活動至 2027/03）'},
+     tw_digital:{rate:3.3,note:'切換「數趣刷」，L1/L2 均為 3.3%（活動至 2027/03）'},
+     tw_shopee:{rate:3.3,note:'切換「數趣刷」，L1/L2 均為 3.3%（活動至 2027/03）'},
      tw_costco:{rate:0.3,note:'⚠️ 台新官網權益方案全文查無「好市多／Costco」，並無此加碼通路，僅一般消費 0.3%'},
-     tw_insurance:{rate:1.3,note:'台灣保費 1.3%。每期帳單加碼回饋的消費金額上限＝永久信用額度＋NT$30 萬'},
+     tw_insurance:{rate:1.3,note:'⚠️ 台灣保費 1.3%（新活動期 7/1 起是否適用 3.3% 官網未確認，待人工複查）'},
      tw_default:{rate:0.3,note:'一般消費 0.3% 台新Point，無上限'},
    }},
   // ─── 國泰世華 ───
@@ -242,7 +212,7 @@ const CARD_DB = [
          cap:{amt:600,per:'month',unit:'好多金'},
          valid:{from:'2026-01-01',to:'2026-12-31'},
          source:'https://cardpromote.taipeifubon.com.tw/promotion/Detail?sn=C000270',
-         checkedAt:'2026-08-24'}]},
+         checkedAt:'2026-08-29'}]},
      tw_default:{rate:1.0},
    }},
   // ─── 將來銀行 ───
@@ -372,17 +342,17 @@ const CARD_DB = [
   {id:'esun_ubear',bank:'玉山銀行',name:'U Bear 信用卡',
    color:'#005DA0',fee:1.5,rewardType:'cash',rewardLabel:'現金回饋',
    officialUrl:'https://www.esunbank.com/zh-tw/personal/credit-card/intro/bank-card/u-bear',
-   source:'https://www.esunbank.com/zh-tw/personal/credit-card/intro/bank-card/u-bear',checkedAt:'2026-08-24',
+   source:'https://www.esunbank.com/zh-tw/personal/credit-card/intro/bank-card/u-bear',checkedAt:'2026-08-29',
    defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
-     overseas_subscription:{rate:10.0,note:'指定數位訂閱（Netflix、ChatGPT、Gemini、Steam、Nintendo、PlayStation、Google One、Google Services）最高 10%，每期回饋上限 NT$100（⚠️ Spotify 不在清單；官網此段未列任何帳單e化／自扣條件）（活動至 2026/08/31，官網尚無 9 月後公告）'},
+     overseas_subscription:{rate:10.0,note:'指定數位訂閱（Netflix、ChatGPT、Gemini、Steam、Nintendo、PlayStation、Google One、Google Services）最高 10%，每期回饋上限 NT$100（⚠️ Spotify 不在清單；官網此段未列任何帳單e化／自扣條件）（活動至 2027/02/28）'},
      // 2026-08-24 查核更正：原本寫「指定海外網購通路」，官網實際涵蓋範圍更廣；
      // 且加碼 2% 只需帳單e化，不需自動扣繳（原資料把門檻寫反了）。
-     overseas_online:{rate:3.0,note:'網路消費 3%（基本 1%+加碼 2%），加碼每期上限 NT$150。涵蓋所有網路消費含國內外線上、行動支付、App 綁卡；加碼 2% 只需綁定帳單e化（Email 電子帳單或簡訊帳單），不需自動扣繳（活動至 2026/08/31，官網尚無 9 月後公告）'},
+     overseas_online:{rate:3.0,note:'網路消費 3%（基本 1%+加碼 2%），加碼每期上限 NT$150。涵蓋所有網路消費含國內外線上、行動支付、App 綁卡；加碼 2% 只需綁定帳單e化（Email 電子帳單或簡訊帳單），不需自動扣繳（活動至 2027/02/28）'},
      // 「兩者皆未設定 = 0%」是先前的推論，官網只寫「其一 0.5%／兩者 1%」，
      // 沒有明文說都沒設就是 0，所以拿掉那句，不替官網補話。
-     overseas_default:{rate:1.0,note:'一般海外 1%（⚠️ 需同時設電子帳單＋玉山帳戶自扣並成功扣繳；僅設一項則 0.5%）（連基本回饋都在活動期內，至 2026/08/31，官網尚無 9 月後公告）'},
-     tw_default:{rate:1.0,note:'基本 1%（⚠️ 需同時設電子帳單＋玉山帳戶自扣並成功扣繳；僅設一項則 0.5%）（活動至 2026/08/31，官網尚無 9 月後公告）'},
+     overseas_default:{rate:1.0,note:'一般海外 1%（⚠️ 需同時設電子帳單＋玉山帳戶自扣並成功扣繳；僅設一項則 0.5%）（活動至 2027/02/28）'},
+     tw_default:{rate:1.0,note:'基本 1%（⚠️ 需同時設電子帳單＋玉山帳戶自扣並成功扣繳；僅設一項則 0.5%）（活動至 2027/02/28）'},
    }},
   {id:'esun_unicard',bank:'玉山銀行',name:'Unicard（UP 選）',
    color:'#B8860B',fee:1.5,rewardType:'points',rewardLabel:'玉山 e point（1 點 = NT$1 可折抵帳單）',
@@ -512,9 +482,9 @@ const CARD_DB = [
               note:'每月 20 日 16:00 開放搶登錄，登錄成功後整季有效（Q3 為 7–9 月），不需每月重複登錄。另需設富邦銀行自動扣繳或申請電子帳單',
               quota:'每月限量 20,000 名、每季總額 60,000 名，搶完即止'},
          cap:{amt:1000,per:'quarter'},
-         valid:{from:'2026-01-01',to:'2026-09-30'},
+         valid:{from:'2026-04-01',to:'2026-09-30'},
          source:'https://cardpromote.taipeifubon.com.tw/promotion/Detail?sn=C000307',
-         checkedAt:'2026-08-24'}]},
+         checkedAt:'2026-08-29'}]},
      overseas_flight:{rate:3.0,note:'日韓航空購票 3%（含廉航 Peach/Jetstar/Jeju Air 等）'},
      overseas_flight_budget:{rate:3.0,note:'日韓廉航購票 3%（Peach、Jetstar Japan、濟州航空等）'},
      overseas_hotel:{rate:1.0},
