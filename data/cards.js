@@ -69,7 +69,7 @@ const CARD_DB = [
   {id:'richart',bank:'台新銀行',name:'Richart 卡',
    color:'#E8001D',fee:1.5,rewardType:'points',rewardLabel:'台新Point（可折抵帳單）',
    officialUrl:'https://www.taishinbank.com.tw/TSB/personal/credit/intro/overview/cg047/card001/',
-   source:'https://www.taishinbank.com.tw/TSB/personal/credit/intro/overview/cg047/card001/',checkedAt:'2026-08-29',
+   source:'https://www.taishinbank.com.tw/TSB/personal/credit/intro/overview/cg047/card001/',checkedAt:'2026-09-01',
    // 2026-08-29 查核（二次確認）：新活動期 2026/7/1–2027/3/31，官網明文
    // 玩旅刷/好饗刷/數趣刷 L1/L2 均為 3.3%；Pay著刷（台新 Pay）L1/L2 均為 3.8%。
    // 原 RICHART_L2 boost（L1=1.3%→L2=3.3%）已不適用，全數移除。
@@ -100,7 +100,7 @@ const CARD_DB = [
      tw_digital:{rate:3.3,note:'切換「數趣刷」，L1/L2 均為 3.3%（活動至 2027/03）'},
      tw_shopee:{rate:3.3,note:'切換「數趣刷」，L1/L2 均為 3.3%（活動至 2027/03）'},
      tw_costco:{rate:0.3,note:'⚠️ 台新官網權益方案全文查無「好市多／Costco」，並無此加碼通路，僅一般消費 0.3%'},
-     tw_insurance:{rate:1.3,note:'⚠️ 台灣保費 1.3%（新活動期 7/1 起是否適用 3.3% 官網未確認，待人工複查）'},
+     tw_insurance:{rate:1.3,note:'台灣保費 1.3%，免切換免登錄（活動至 2027/03）'},
      tw_default:{rate:0.3,note:'一般消費 0.3% 台新Point，無上限'},
    }},
   // ─── 國泰世華 ───
@@ -148,7 +148,7 @@ const CARD_DB = [
    color:'#DA1710',fee:1.5,rewardType:'cash',rewardLabel:'現金積點',
    officialUrl:'https://www.dbs.com.tw/personal-zh/cards/dbs_eco/index.html',
    defaultRate:1.0,capKey:'overseas_physical',capAmt:600,capBonusOnly:true,capBonusPct:4,capBaseRate:1.0,
-   source:'https://www.dbs.com.tw/personal-zh/cards/dbs_eco/index.html',checkedAt:'2026-08-24',
+   source:'https://www.dbs.com.tw/personal-zh/cards/dbs_eco/index.html',checkedAt:'2026-09-01',
    overrides:{
      overseas_physical:{rate:5.0,note:'日本／韓國／泰國／新加坡／美洲／歐洲地區，以實體卡或 Apple Pay／Samsung Pay 於當地實體門市面對面刷卡 5%，回饋上限 NT$600/期，超過後僅 1%',
        boosts:[{
@@ -256,13 +256,13 @@ const CARD_DB = [
   {id:'sinopac_dual',bank:'永豐銀行',name:'幣倍卡',
    color:'#00AEEF',fee:1.5,rewardType:'cash',rewardLabel:'現金回饋（直接折抵）',
    officialUrl:'https://bank.sinopac.com/sinopacBT/personal/credit-card/introduction/bankcard/dual-currency-card.html',
-   source:'https://bank.sinopac.com/sinopacBT/personal/credit-card/introduction/bankcard/dual-currency-card.html',checkedAt:'2026-08-24',
+   source:'https://bank.sinopac.com/sinopacBT/personal/credit-card/introduction/bankcard/dual-currency-card.html',checkedAt:'2026-09-01',
    defaultRate:2.0,capKey:'overseas_physical',capAmt:800,capBonusOnly:true,capBonusPct:4,capBaseRate:2.0,
    overrides:{
      // 2026-08-24 查核：6% / NT$800 上限 / 雙任務門檻均與官網相符。
      // 但原 note 的「2026/07 起僅剩單一等級」官網查無此句，已改為官網有明文的說法。
      overseas_physical:{rate:6.0,note:'精選通路 2%+4%=6%（一般海外實體商店；回饋上限 NT$800/帳單週期）。⚠️ 兩項任務缺一不可：①綁永豐台外幣帳戶自動扣繳成功＋設電子/行動帳單並取消實體帳單 ②前月往來資產月平均餘額 ≥NT$10 萬，或當月為 DAWHO 大戶／大戶Plus 等級（大戶與大戶Plus 適用同一檔 +4%）（活動至 2026/12/31）'},
-     overseas_online:{rate:6.0,note:'精選網購通路 6%：Amazon、Rakuten、Mercari、eBay、iHerb、Selfridges、Gmarket、Olive Young、淘寶、SUICA/PASMO/ICOCA 儲值、大國藥妝、Sugi藥妝、Klook、KKDAY、Booking.com、Agoda、Hotels、Airbnb、Expedia、Trip.com、Trivago、AsiaYo、旅行社 等；回饋上限 NT$800/帳單週期；需完成雙任務（見海外實體說明）（活動至 2026/12/31）'},
+     overseas_online:{rate:6.0,note:'精選網購通路 6%：Amazon、Rakuten、Mercari、eBay、iHerb、Selfridges、Gmarket、Olive Young、淘寶、SUICA/PASMO/ICOCA 儲值、大國藥妝、Sugi藥妝、Klook、KKDAY、Booking.com、Agoda、Hotels、Airbnb、Expedia、Trip.com、Trivago、AsiaYo、歐特儀松山機場停車消費、旅行社 等；回饋上限 NT$800/帳單週期；需完成雙任務（見海外實體說明）（活動至 2026/12/31）'},
      overseas_flight:{rate:6.0,note:'航空公司購票 6%（回饋上限 NT$800/帳單週期；需完成雙任務）（活動至 2026/12/31）'},
      // 2026-08-24 查核：官網只寫「航空公司」，未明文納入或排除廉航，且加碼依收單行業代號判定。
      // 原本寫 6% 沒有官方依據，不能拿沒查到的東西當保證，先退回非精選通路的 2%。
@@ -328,7 +328,7 @@ const CARD_DB = [
   {id:'esun_pi',bank:'玉山銀行',name:'Pi 拍錢包信用卡',
    color:'#7B2D8B',fee:1.5,rewardType:'restricted',rewardLabel:'P幣（限 Pi 錢包使用）',
    officialUrl:'https://www.esunbank.com/zh-tw/personal/credit-card/intro/co-branded-card/pi-card',
-   source:'https://www.esunbank.com/zh-tw/personal/credit-card/intro/co-branded-card/pi-card',checkedAt:'2026-08-24',
+   source:'https://www.esunbank.com/zh-tw/personal/credit-card/intro/co-branded-card/pi-card',checkedAt:'2026-09-01',
    defaultRate:1.0,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
      // 2026-08-24 查核新增：玉山公告把 28 個歐洲國家（含英國）的實體商店消費
@@ -336,8 +336,8 @@ const CARD_DB = [
      // 對住英國的使用者這格等於 0，原本沒有這個 override 會誤導成 1%。
      overseas_physical:{rate:0,note:'⚠️ 英國等 28 個歐洲國家實體商店消費完全不給 P幣（玉山公告列為非一般消費，各種支付方式皆不提供回饋）。此情境請改用其他卡',
        source:'https://event.esunbank.com.tw/credit/notice/index.html',checkedAt:'2026-08-24'},
-     overseas_default:{rate:1.0,note:'一般海外 1% P幣，扣 1.5% 手續費後淨 -0.5%（活動至 2026/08/31，官網尚無 9 月後公告）'},
-     tw_default:{rate:1.0,note:'基本 1% P幣（需設定電子帳單）（活動至 2026/08/31，官網尚無 9 月後公告）'},
+     overseas_default:{rate:1.0,note:'一般海外 1% P幣，扣 1.5% 手續費後淨 -0.5%；當月國內外一般消費累滿 NT$30,000 再加碼 2%，最高 3%（活動至 2027/02/28）'},
+     tw_default:{rate:1.0,note:'基本 1% P幣（需帳單e化，未申辦者 0.3%）；當月國內外一般消費累滿 NT$30,000 再加碼 2%，最高 3%（活動至 2027/02/28）'},
    }},
   {id:'esun_ubear',bank:'玉山銀行',name:'U Bear 信用卡',
    color:'#005DA0',fee:1.5,rewardType:'cash',rewardLabel:'現金回饋',
