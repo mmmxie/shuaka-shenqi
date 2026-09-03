@@ -9,24 +9,47 @@
   <array>
     <string>/bin/bash</string>
     <string>-lc</string>
-    <string>/Users/m.hsieh/Downloads/Mark-Agent/shuaka-repo/ci/local_daily_update.sh</string>
+    <string>/Users/m.hsieh/Mark-Agent/shuaka-repo/ci/local_daily_update.sh</string>
   </array>
 
-  <!-- 每天英國時間 09:00。
+  <!-- 每月 1 號英國時間 09:00（2026-09-03 從「每天」改為「每月一次」，Mark 要求）。
+       2、3 號這兩筆是失敗自動重試：腳本成功後會寫下 ci/.last-success-month，
+       後兩次觸發一看到本月已完成就立刻跳出，不會重複跑 Claude。
+       launchd 沒有「失敗才重試」的語意，它只認時間，所以判斷放在腳本裡。
        用 launchd 而不是 crontab：電腦睡眠或關機時錯過的排程，
        launchd 會在下次喚醒時補跑一次，crontab 會直接跳過。 -->
   <key>StartCalendarInterval</key>
-  <dict>
-    <key>Hour</key>
-    <integer>9</integer>
-    <key>Minute</key>
-    <integer>0</integer>
-  </dict>
+  <array>
+    <dict>
+      <key>Day</key>
+      <integer>1</integer>
+      <key>Hour</key>
+      <integer>9</integer>
+      <key>Minute</key>
+      <integer>0</integer>
+    </dict>
+    <dict>
+      <key>Day</key>
+      <integer>2</integer>
+      <key>Hour</key>
+      <integer>9</integer>
+      <key>Minute</key>
+      <integer>0</integer>
+    </dict>
+    <dict>
+      <key>Day</key>
+      <integer>3</integer>
+      <key>Hour</key>
+      <integer>9</integer>
+      <key>Minute</key>
+      <integer>0</integer>
+    </dict>
+  </array>
 
   <key>StandardOutPath</key>
-  <string>/Users/m.hsieh/Downloads/Mark-Agent/shuaka-repo/ci/logs/launchd.out.log</string>
+  <string>/Users/m.hsieh/Mark-Agent/shuaka-repo/ci/logs/launchd.out.log</string>
   <key>StandardErrorPath</key>
-  <string>/Users/m.hsieh/Downloads/Mark-Agent/shuaka-repo/ci/logs/launchd.err.log</string>
+  <string>/Users/m.hsieh/Mark-Agent/shuaka-repo/ci/logs/launchd.err.log</string>
 
   <key>RunAtLoad</key>
   <false/>

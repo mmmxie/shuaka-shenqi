@@ -1,5 +1,5 @@
 #!/bin/bash
-# 刷卡神器 — 每日資料核查（本機 launchd 版）
+# 刷卡神器 — 每月資料核查（本機 launchd 版）
 #
 # 為什麼跑本機而不是 GitHub Actions：
 #   雲端版靠 CLAUDE_CODE_OAUTH_TOKEN，那把 token 從 2026-07-05 起被
@@ -7,12 +7,23 @@
 #   本機用已登入的 session 跑 headless 沒有這個問題，一樣走訂閱額度、零額外費用。
 #   等哪天那條路修好了，把 .github/workflows/daily-update.yml 的 schedule 取消註解即可。
 #
-# 由 ~/Library/LaunchAgents/com.mark.shuaka-daily.plist 每天觸發。
+# 由 ~/Library/LaunchAgents/com.mark.shuaka-daily.plist 每月 1 號觸發（2026-09-03 前為每天）。
 
 set -uo pipefail
 
-REPO="/Users/m.hsieh/Downloads/Mark-Agent/shuaka-repo"
-DATA_FILE="data/cards.js"   # 只有資料，不含程式碼。AI 每天只讀改這個檔。
+# ── 計費防護（Mark 的硬規則：一律不用按量計費的 API key）─────────────────
+# 這支的 plist 是唯一用 `/bin/bash -lc` 的，-l 會載入 login profile，
+# 是四支排程裡唯一可能把環境變數帶進來的那支。目前 profile 是乾淨的，
+# 但這裡不依賴那件事。
+unset ANTHROPIC_API_KEY ANTHROPIC_AUTH_TOKEN
+if [ -n "${ANTHROPIC_BASE_URL:-}" ] || [ -n "${ANTHROPIC_VERTEX_PROJECT_ID:-}" ] || [ -n "${CLAUDE_CODE_USE_BEDROCK:-}" ]; then
+  echo "refusing to run: a non-subscription Anthropic endpoint is configured" >&2
+  osascript -e 'display notification "偵測到非訂閱端點，已拒絕執行" with title "刷卡神器每月核查" sound name "Basso"' 2>/dev/null
+  exit 1
+fi
+
+REPO="/Users/m.hsieh/Mark-Agent/shuaka-repo"
+DATA_FILE="data/cards.js"   # 只有資料，不含程式碼。AI 每次只讀改這個檔。
 LOG_DIR="$REPO/ci/logs"
 STATUS="$REPO/ci/LAST-RUN.md"
 
@@ -27,13 +38,13 @@ LOG="$LOG_DIR/$TODAY.log"
 # 失敗時彈 macOS 通知。這支排程上次靜靜壞了兩個月都沒人發現，
 # 所以每一種失敗都必須發出聲音。
 notify() {
-  osascript -e "display notification \"$1\" with title \"刷卡神器每日核查\" sound name \"Basso\"" 2>/dev/null
+  osascript -e "display notification \"$1${RETRY_HINT:-}\" with title \"刷卡神器每月核查\" sound name \"Basso\"" 2>/dev/null
 }
 
 # 不管成功失敗都要留下紀錄，這樣「上次成功是什麼時候」永遠查得到
 write_status() {
   cat > "$STATUS" <<EOF
-# 每日核查狀態
+# 每月核查狀態
 
 - **上次執行**：$NOW
 - **結果**：$1
@@ -46,6 +57,31 @@ EOF
 
 exec > >(tee -a "$LOG") 2>&1
 echo "===== $NOW 開始 ====="
+
+# ── 每月一次 + 失敗自動重試（2026-09-03 加）──────────────────────────────
+# plist 在每月 1、2、3 號 09:00 都會觸發這支。第一次成功後會把「本月」寫進
+# SUCCESS_MARK，後面兩次一看到本月已完成就直接跳出 —— 所以正常情況一個月
+# 只會真的跑一次 Claude，只有 1 號失敗（額度上限、斷網這種暫時性問題，
+# 2026-08-30 與 08-31 各中過一次）才會用掉 2 號、3 號的重試機會。
+#
+# 為什麼用「印記檔」而不是讓 launchd 自己重試：launchd 沒有「失敗才重試」
+# 這種語意，它只認時間。所以由腳本自己判斷該不該跑。
+SUCCESS_MARK="$REPO/ci/.last-success-month"
+THIS_MONTH=$(date '+%Y-%m')
+DOM=$((10#$(date '+%d')))   # 10# 是強制十進位，否則 08、09 會被當成非法八進位而中止
+LAST_RETRY_DOM=3
+
+if [ -f "$SUCCESS_MARK" ] && [ "$(cat "$SUCCESS_MARK")" = "$THIS_MONTH" ]; then
+  echo "本月（${THIS_MONTH}）已核查成功，跳過這次重試觸發。"
+  echo "===== 完成 ====="
+  exit 0
+fi
+
+if [ "$DOM" -ge "$LAST_RETRY_DOM" ]; then
+  RETRY_HINT="（本月最後一次重試，失敗就要手動處理）"
+else
+  RETRY_HINT="（明天 09:00 會自動重試）"
+fi
 
 # 先同步遠端，避免本機跟雲端各改各的造成分岔（2026-08-24 就撞過一次）
 if ! git pull --rebase --autostash origin main; then
@@ -155,7 +191,7 @@ else
   sed -i '' "s|data/cards\.js?v=[0-9]*|data/cards.js?v=${VER}|" index.html
   echo "已將 cards.js 版本號更新為 ${VER}"
   git add "$DATA_FILE" index.html
-  git commit -q -m "每日自動更新 $TODAY"
+  git commit -q -m "每月自動更新 ${TODAY}"
   if git push origin main; then
     echo "已更新並推送"
     write_status "✅ 成功（已更新）" "$(git show --stat --oneline HEAD | tail -n +2 | head -3)"
@@ -166,6 +202,10 @@ else
     exit 1
   fi
 fi
+
+# 走到這裡代表這個月已經核查成功（無變更或已推送都算），
+# 記下來讓 2 號、3 號的重試觸發直接跳過。
+echo "$THIS_MONTH" > "$SUCCESS_MARK"
 
 # log 只留 30 天
 find "$LOG_DIR" -name '*.log' -mtime +30 -delete 2>/dev/null
