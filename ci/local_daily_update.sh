@@ -7,13 +7,15 @@
 #   本機用已登入的 session 跑 headless 沒有這個問題，一樣走訂閱額度、零額外費用。
 #   等哪天那條路修好了，把 .github/workflows/daily-update.yml 的 schedule 取消註解即可。
 #
-# 由 ~/Library/LaunchAgents/com.mark.shuaka-daily.plist 每月 1 號觸發（2026-09-03 前為每天）。
+# 由 ~/Library/LaunchAgents/com.mark.shuaka-daily.plist 於每月 1、2、3 號 09:00 觸發
+# （2026-09-03 前為每天）。2、3 號是失敗重試用的，成功後會被印記檔擋掉，
+# 詳見下方「每月一次 + 失敗自動重試」區塊。
 
 set -uo pipefail
 
 # ── 計費防護（Mark 的硬規則：一律不用按量計費的 API key）─────────────────
 # 這支的 plist 是唯一用 `/bin/bash -lc` 的，-l 會載入 login profile，
-# 是四支排程裡唯一可能把環境變數帶進來的那支。目前 profile 是乾淨的，
+# 是三支排程裡唯一可能把環境變數帶進來的那支。目前 profile 是乾淨的，
 # 但這裡不依賴那件事。
 unset ANTHROPIC_API_KEY ANTHROPIC_AUTH_TOKEN
 if [ -n "${ANTHROPIC_BASE_URL:-}" ] || [ -n "${ANTHROPIC_VERTEX_PROJECT_ID:-}" ] || [ -n "${CLAUDE_CODE_USE_BEDROCK:-}" ]; then
@@ -191,7 +193,14 @@ else
   sed -i '' "s|data/cards\.js?v=[0-9]*|data/cards.js?v=${VER}|" index.html
   echo "已將 cards.js 版本號更新為 ${VER}"
   git add "$DATA_FILE" index.html
-  git commit -q -m "每月自動更新 ${TODAY}"
+  # 沒有 set -e，commit 失敗時流程會繼續往下走到 push，而「沒東西可推」時
+  # git push 回傳 0 → 會報成功。所以這裡一定要自己擋。
+  if ! git commit -q -m "每月自動更新 ${TODAY}"; then
+    echo "git commit 失敗"
+    notify "git commit 失敗，資料改動沒有進版控"
+    write_status "❌ 失敗" "git commit 失敗，改動仍留在工作區"
+    exit 1
+  fi
   if git push origin main; then
     echo "已更新並推送"
     write_status "✅ 成功（已更新）" "$(git show --stat --oneline HEAD | tail -n +2 | head -3)"
@@ -203,11 +212,43 @@ else
   fi
 fi
 
-# 走到這裡代表這個月已經核查成功（無變更或已推送都算），
+# ── 成功的定義：本機沒有任何還沒推上遠端的 commit ────────────────────────
+# 2026-09-03 驗收抓到的洞：1 號 push 失敗（改動已 commit、只是沒推出去）→
+# 2 號重試時 git diff 是乾淨的 → 走「無變更」分支 → 回報成功 → 寫下印記 →
+# 3 號跳過 → 那個 commit 永遠沒推出去，網站沒更新，但通知說成功，
+# 而且要等一個月才會再試。
+#
+# 所以「這次沒東西要改」不等於成功，「遠端拿到了」才算。
+ensure_pushed() {
+  git fetch -q origin main 2>/dev/null
+  AHEAD=$(git rev-list --count origin/main..HEAD 2>/dev/null || echo "?")
+  if [ "$AHEAD" = "0" ]; then
+    return 0
+  fi
+  echo "偵測到 ${AHEAD} 個未推送的 commit（可能是上次 push 失敗留下的），補推中"
+  if git push origin main; then
+    AHEAD=$(git rev-list --count origin/main..HEAD 2>/dev/null || echo "?")
+    if [ "$AHEAD" = "0" ]; then
+      echo "補推成功，遠端已同步"
+      return 0
+    fi
+  fi
+  echo "補推失敗，仍有 ${AHEAD} 個 commit 留在本機"
+  notify "有 ${AHEAD} 個 commit 沒推上遠端，網站沒拿到更新"
+  write_status "❌ 失敗" "本機領先遠端 ${AHEAD} 個 commit，push 沒成功，需手動處理"
+  return 1
+}
+
+# 這道閘門沒過就不算成功，也就不寫印記 —— 下個觸發日還會再試一次。
+ensure_pushed || exit 1
+
+# 走到這裡代表這個月真的核查完成而且遠端同步了。
 # 記下來讓 2 號、3 號的重試觸發直接跳過。
 echo "$THIS_MONTH" > "$SUCCESS_MARK"
 
-# log 只留 30 天
-find "$LOG_DIR" -name '*.log' -mtime +30 -delete 2>/dev/null
+# log 保留一年。改月更之後，原本的「只留 30 天」會讓大部分時間只剩 1 份 log，
+# 出事要回溯上個月時剛好被自己刪掉。檔名樣式限定成日期檔，
+# 才不會把 launchd.out.log / launchd.err.log 這兩份也一起刪掉。
+find "$LOG_DIR" -name '????-??-??.log' -mtime +365 -delete 2>/dev/null
 
 echo "===== 完成 ====="
