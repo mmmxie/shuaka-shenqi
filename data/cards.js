@@ -69,7 +69,9 @@ const CARD_DB = [
   {id:'richart',bank:'台新銀行',name:'Richart 卡',
    color:'#E8001D',fee:1.5,rewardType:'points',rewardLabel:'台新Point（可折抵帳單）',
    officialUrl:'https://www.taishinbank.com.tw/TSB/personal/credit/intro/overview/cg047/card001/',
-   source:'https://www.taishinbank.com.tw/TSB/personal/credit/intro/overview/cg047/card001/',checkedAt:'2026-09-01',
+   source:'https://www.taishinbank.com.tw/TSB/personal/credit/intro/overview/cg047/card001/',checkedAt:'2026-11-01',
+   // 2026-11-01 查核：官網明文「好評延長！2026/7/1-2027/12/31 之消費適用」，
+   // 活動期由原 2027/3/31 延長至 2027/12/31，各方案 note 均已更新。
    // 2026-08-29 查核（二次確認）：新活動期 2026/7/1–2027/3/31，官網明文
    // 玩旅刷/好饗刷/數趣刷 L1/L2 均為 3.3%；Pay著刷（台新 Pay）L1/L2 均為 3.8%。
    // 原 RICHART_L2 boost（L1=1.3%→L2=3.3%）已不適用，全數移除。
@@ -77,13 +79,13 @@ const CARD_DB = [
    // ⚠️ tw_insurance 是否也升至 3.3% 官網未明確確認，保守維持 1.3%，待人工複查。
    defaultRate:0.3,capKey:null,capAmt:0,capBonusOnly:false,capBonusPct:0,capBaseRate:0,
    overrides:{
-     overseas_physical:{rate:3.3,note:'切換「玩旅刷」，L1/L2 均為 3.3%（活動至 2027/03）'},
-     overseas_online:{rate:3.3,note:'切換「玩旅刷」或「數趣刷」，L1/L2 均為 3.3%（活動至 2027/03）'},
-     overseas_subscription:{rate:3.3,note:'切換「數趣刷」，L1/L2 均為 3.3%（活動至 2027/03）'},
-     overseas_apple:{rate:3.3,note:'⚠️ Apple 不在「數趣刷」清單內。海外 Apple 消費請走「玩旅刷」海外消費計算，L1/L2 均為 3.3%（活動至 2027/03）'},
+     overseas_physical:{rate:3.3,note:'切換「玩旅刷」，L1/L2 均為 3.3%（活動至 2027/12/31）'},
+     overseas_online:{rate:3.3,note:'切換「玩旅刷」或「數趣刷」，L1/L2 均為 3.3%（活動至 2027/12/31）'},
+     overseas_subscription:{rate:3.3,note:'切換「數趣刷」，L1/L2 均為 3.3%（活動至 2027/12/31）'},
+     overseas_apple:{rate:3.3,note:'⚠️ Apple 不在「數趣刷」清單內。海外 Apple 消費請走「玩旅刷」海外消費計算，L1/L2 均為 3.3%（活動至 2027/12/31）'},
      overseas_insurance:{rate:0.3,note:'⚠️ 海外保費不算加碼通路。官網明文「保費認列不含國外保險交易…海外保險、非臺灣保險公司扣繳之保險費」，僅一般消費 0.3%'},
-     overseas_flight:{rate:3.3,note:'切換「玩旅刷」，L1/L2 均為 3.3%（活動至 2027/03）'},
-     overseas_hotel:{rate:3.3,note:'切換「玩旅刷」，L1/L2 均為 3.3%（活動至 2027/03）',
+     overseas_flight:{rate:3.3,note:'切換「玩旅刷」，L1/L2 均為 3.3%（活動至 2027/12/31）'},
+     overseas_hotel:{rate:3.3,note:'切換「玩旅刷」，L1/L2 均為 3.3%（活動至 2027/12/31）',
        boosts:[{
          id:'richart-agoda-hotel',
          label:'Agoda 專屬網頁訂房',
@@ -94,13 +96,13 @@ const CARD_DB = [
          valid:{from:'2026-01-01',to:'2026-12-31'},
          source:'https://mkpcard.taishinbank.com.tw/tscccms/promotion/detail/WM_20251226092735504',
          checkedAt:'2026-08-24'}]},
-     overseas_default:{rate:3.3,note:'切換「玩旅刷」，L1/L2 均為 3.3%（活動至 2027/03）'},
-     tw_cvs:{rate:3.8,note:'切換「Pay著刷」，台新 Pay 超商 3.8%，L1/L2 均為 3.8%（⚠️ 限全家、7-11 兩大超商；LINE Pay 最高 2.3% 且不含四大超商）（活動至 2027/03）'},
-     tw_dining:{rate:3.3,note:'切換「好饗刷」，L1/L2 均為 3.3%（活動至 2027/03）'},
-     tw_digital:{rate:3.3,note:'切換「數趣刷」，L1/L2 均為 3.3%（活動至 2027/03）'},
-     tw_shopee:{rate:3.3,note:'切換「數趣刷」，L1/L2 均為 3.3%（活動至 2027/03）'},
+     overseas_default:{rate:3.3,note:'切換「玩旅刷」，L1/L2 均為 3.3%（活動至 2027/12/31）'},
+     tw_cvs:{rate:3.8,note:'切換「Pay著刷」，台新 Pay 超商 3.8%，L1/L2 均為 3.8%（⚠️ 限全家、7-11 兩大超商；LINE Pay 最高 2.3% 且不含四大超商）（活動至 2027/12/31）'},
+     tw_dining:{rate:3.3,note:'切換「好饗刷」，L1/L2 均為 3.3%（活動至 2027/12/31）'},
+     tw_digital:{rate:3.3,note:'切換「數趣刷」，L1/L2 均為 3.3%（活動至 2027/12/31）'},
+     tw_shopee:{rate:3.3,note:'切換「數趣刷」，L1/L2 均為 3.3%（活動至 2027/12/31）'},
      tw_costco:{rate:0.3,note:'⚠️ 台新官網權益方案全文查無「好市多／Costco」，並無此加碼通路，僅一般消費 0.3%'},
-     tw_insurance:{rate:1.3,note:'台灣保費 1.3%，免切換免登錄（活動至 2027/03）'},
+     tw_insurance:{rate:1.3,note:'台灣保費 1.3%，免切換免登錄（活動至 2027/12/31）'},
      tw_default:{rate:0.3,note:'一般消費 0.3% 台新Point，無上限'},
    }},
   // ─── 國泰世華 ───
@@ -148,9 +150,9 @@ const CARD_DB = [
    color:'#DA1710',fee:1.5,rewardType:'cash',rewardLabel:'現金積點',
    officialUrl:'https://www.dbs.com.tw/personal-zh/cards/dbs_eco/index.html',
    defaultRate:1.0,capKey:'overseas_physical',capAmt:600,capBonusOnly:true,capBonusPct:4,capBaseRate:1.0,
-   source:'https://www.dbs.com.tw/personal-zh/cards/dbs_eco/index.html',checkedAt:'2026-09-01',
+   source:'https://www.dbs.com.tw/personal-zh/cards/dbs_eco/index.html',checkedAt:'2026-11-01',
    overrides:{
-     overseas_physical:{rate:5.0,note:'日本／韓國／泰國／新加坡／美洲／歐洲地區，以實體卡或 Apple Pay／Samsung Pay 於當地實體門市面對面刷卡 5%，回饋上限 NT$600/期，超過後僅 1%',
+     overseas_physical:{rate:5.0,note:'日本／韓國／泰國／新加坡／美洲／歐洲地區，以實體卡或 Apple Pay／Samsung Pay 於當地實體門市面對面刷卡 5%，回饋上限 NT$600/期，超過後僅 1%（活動至 2026/12/31）',
        boosts:[{
          id:'dbs-eco-oversea-monthly-3pct',
          label:'海外實體月加碼 3%',
@@ -479,12 +481,12 @@ const CARD_DB = [
          channel:'限日本、韓國、泰國等指定亞洲國家的實體商店，單筆須滿 NT$1,000。英國與歐洲經濟區不適用',
          reg:{period:'quarter', opensDom:20,
               url:'https://cardpromote.taipeifubon.com.tw/promotion/Detail?sn=C000307',
-              note:'每月 20 日 16:00 開放搶登錄，登錄成功後整季有效（Q3 為 7–9 月），不需每月重複登錄。另需設富邦銀行自動扣繳或申請電子帳單',
+              note:'每月 20 日 16:00 開放搶登錄，登錄成功後整季有效，不需每月重複登錄。另需設富邦銀行自動扣繳或申請電子帳單',
               quota:'每月限量 20,000 名、每季總額 60,000 名，搶完即止'},
          cap:{amt:1000,per:'quarter'},
-         valid:{from:'2026-04-01',to:'2026-09-30'},
+         valid:{from:'2026-04-01',to:'2026-12-31'},
          source:'https://cardpromote.taipeifubon.com.tw/promotion/Detail?sn=C000307',
-         checkedAt:'2026-08-29'}]},
+         checkedAt:'2026-11-01'}]},
      overseas_flight:{rate:3.0,note:'日韓航空購票 3%（含廉航 Peach/Jetstar/Jeju Air 等）'},
      overseas_flight_budget:{rate:3.0,note:'日韓廉航購票 3%（Peach、Jetstar Japan、濟州航空等）'},
      overseas_hotel:{rate:1.0},
